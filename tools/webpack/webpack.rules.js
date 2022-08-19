@@ -1,3 +1,7 @@
+const { inDev } = require('./webpack.helpers');
+
+const isDevelopment = inDev();
+
 module.exports = [
   {
     // Add support for native node modules
@@ -32,8 +36,28 @@ module.exports = [
     use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
   },
   {
+    test: /\.module\.s(a|c)ss$/,
+    use: [
+      { loader: 'style-loader' },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: true,
+          sourceMap: isDevelopment,
+        },
+      },
+      {
+        loader: 'sass-loader',
+        options: {
+          sourceMap: isDevelopment,
+        },
+      },
+    ],
+  },
+  {
     // SCSS (SASS) Loader
     test: /\.s[ac]ss$/i,
+    exclude: /\.module.(s(a|c)ss)$/,
     use: [
       { loader: 'style-loader' },
       { loader: 'css-loader' },
