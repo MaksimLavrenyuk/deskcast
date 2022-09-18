@@ -1,8 +1,8 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
-import { ConnectionManager } from './types';
+import { Receiver } from '../Receiver';
 
 type WatcherDeps = {
-  connectionManager: ConnectionManager,
+  receiver: Receiver,
 }
 
 export type WatcherEvents = {
@@ -14,28 +14,23 @@ const PEER_CONNECTION_CONFIG = {
     {
       urls: 'stun:stun.l.google.com:19302',
     },
-    // {
-    //   "urls": "turn:TURN_IP?transport=tcp",
-    //   "username": "TURN_USERNAME",
-    //   "credential": "TURN_CREDENTIALS"
-    // }
   ],
 };
 
 class Watcher {
-  private readonly connectionManager: ConnectionManager;
+  private readonly connectionReceiver: Receiver;
 
   private peerConnection: RTCPeerConnection | null;
 
   private eventEmitter: StrictEventEmitter<WatcherEvents>;
 
   constructor(deps: WatcherDeps) {
-    this.connectionManager = deps.connectionManager;
+    this.connectionReceiver = deps.receiver;
     this.peerConnection = null;
     this.eventEmitter = new StrictEventEmitter<WatcherEvents>();
 
-    this.connectionManager.on('candidate', this.candidateHandler);
-    this.connectionManager.on('offer', this.offerHandler);
+    this.connectionReceiver.on('candidate', this.candidateHandler);
+    this.connectionReceiver.on('offer', this.offerHandler);
   }
 
   private offerHandler = async (description: RTCSessionDescriptionInit) => {
@@ -47,7 +42,7 @@ class Watcher {
       await this.peerConnection.setRemoteDescription(description);
       const sdp = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(sdp);
-      this.connectionManager.answer(this.peerConnection.localDescription);
+      this.connectionReceiver.answer(this.peerConnection.localDescription);
     } catch (e) {
       console.log(e);
     }
@@ -58,7 +53,7 @@ class Watcher {
   };
 
   private iceCandidateHandler = (event: RTCPeerConnectionIceEvent) => {
-    this.connectionManager.candidate(event.candidate);
+    this.connectionReceiver.candidate(event.candidate);
   };
 
   private candidateHandler = async (candidateInit: RTCIceCandidateInit) => {
@@ -80,7 +75,7 @@ class Watcher {
   };
 
   public dispose() {
-    this.connectionManager.close();
+    this.connectionReceiver.close();
     this.peerConnection.close();
   }
 }

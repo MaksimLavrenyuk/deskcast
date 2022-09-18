@@ -1,30 +1,24 @@
 import { Server, Socket as SocketDefault } from 'socket.io';
+import {
+  ManagerToReceiverEvents,
+  ManagerToSenderEvents,
+  ReceiverToManagerEvents,
+  SenderToManagerEvents,
+} from '../types';
 
 type BrockerProps = {
-    port: number
+  port: number
 }
 
 type ListenEvents = {
-    connection: (socket: SocketDefault) => void
-    broadcaster: () => void
-    watcher: () => void
-    offer: (id: string, description: RTCSessionDescription) => void
-    answer: (id: string, description: RTCSessionDescription) => void
-    candidate: (id: string, candidate: RTCIceCandidate) => void
-};
+  connection: (socket: SocketDefault) => void
+} & ReceiverToManagerEvents & SenderToManagerEvents;
 
-type EmitEvents = {
-    broadcaster: () => void
-    watcher: (id: string) => void
-    offer: (id: string, description: RTCSessionDescription) => void
-    answer: (id: string, description: RTCSessionDescriptionInit) => void
-    candidate: (id: string, candidate: RTCIceCandidateInit) => void
-    disconnectPeer: (id: string) => void
-}
+type EmitEvents = ManagerToSenderEvents & ManagerToReceiverEvents;
 
 type Socket = SocketDefault<ListenEvents, EmitEvents>;
 
-class Broker {
+class SocketConnectionManager {
   private io: Server<ListenEvents, EmitEvents>;
 
   private broadcaster: string | null;
@@ -36,7 +30,6 @@ class Broker {
         origin: '*',
       },
     });
-    console.log('hello');
 
     this.connectionHandler = this.connectionHandler.bind(this);
     this.createBroadcasterHandler = this.createBroadcasterHandler.bind(this);
@@ -106,4 +99,4 @@ class Broker {
   }
 }
 
-export default Broker;
+export default SocketConnectionManager;

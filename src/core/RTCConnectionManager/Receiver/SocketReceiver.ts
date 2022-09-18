@@ -1,22 +1,12 @@
 import { io, Socket } from 'socket.io-client';
 import { StrictEventEmitter } from 'strict-event-emitter';
-import { ConnectionManager, ConnectionEvents } from '../types';
+import { Receiver, ReceiverEvents } from './index';
+import { ManagerToReceiverEvents, ReceiverToManagerEvents } from '../types';
 
-type ServerToClientEvents = {
-  broadcaster: () => void
-  offer: (id: string, description: RTCSessionDescriptionInit) => void;
-}
+class SocketReceiver implements Receiver {
+  private socket: Socket<ManagerToReceiverEvents, ReceiverToManagerEvents>;
 
-type ClientToServerEvents = {
-  answer: (id: string, description: RTCSessionDescription) => void;
-  candidate: (id: string, candidate: RTCIceCandidate) => void
-  watcher: () => void
-}
-
-class Receiver implements ConnectionManager {
-  private socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-
-  private eventEmitter: StrictEventEmitter<ConnectionEvents>;
+  private eventEmitter: StrictEventEmitter<ReceiverEvents>;
 
   private connectionID: string | null;
 
@@ -72,9 +62,9 @@ class Receiver implements ConnectionManager {
     this.socket.emit('watcher');
   }
 
-  on<Event extends keyof ConnectionEvents>(event: Event, listener: ConnectionEvents[Event]): void {
+  on<Event extends keyof ReceiverEvents>(event: Event, listener: ReceiverEvents[Event]): void {
     this.eventEmitter.on(event, listener);
   }
 }
 
-export default Receiver;
+export default SocketReceiver;

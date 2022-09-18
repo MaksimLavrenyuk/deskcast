@@ -1,24 +1,12 @@
 import { io, Socket } from 'socket.io-client';
 import { StrictEventEmitter } from 'strict-event-emitter';
-import { ConnectionManager, ConnectionEvents } from '../types';
+import { SenderEvents, Sender } from './index';
+import { ManagerToSenderEvents, SenderToManagerEvents } from '../types';
 
-type ServerToClientEvents = {
-  watcher: (id: string) => void
-  candidate: (id: string, candidate: RTCIceCandidateInit) => void
-  answer: (id: string, description: RTCSessionDescriptionInit) => void;
-  disconnectPeer: (id: string) => void
-}
+class SocketSender implements Sender {
+  private socket: Socket<ManagerToSenderEvents, SenderToManagerEvents>;
 
-type ClientToServerEvents = {
-  offer: (id: string, description: RTCSessionDescription) => void;
-  candidate: (id: string, candidate: RTCIceCandidate) => void
-  broadcaster: () => void
-}
-
-class Sender implements ConnectionManager {
-  private socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-
-  private eventEmitter: StrictEventEmitter<ConnectionEvents>;
+  private eventEmitter: StrictEventEmitter<SenderEvents>;
 
   constructor() {
     this.socket = io('ws://localhost:4002');
@@ -39,7 +27,6 @@ class Sender implements ConnectionManager {
   }
 
   private answerHandler(id: string, description: RTCSessionDescriptionInit) {
-    console.log('answer');
     this.eventEmitter.emit('answer', id, description);
   }
 
@@ -55,7 +42,7 @@ class Sender implements ConnectionManager {
     this.eventEmitter.emit('disconnectPeer', id);
   }
 
-  public on<Event extends keyof ConnectionEvents>(event: Event, listener: ConnectionEvents[Event]) {
+  public on<Event extends keyof SenderEvents>(event: Event, listener: SenderEvents[Event]) {
     this.eventEmitter.on(event, listener);
   }
 
@@ -76,4 +63,4 @@ class Sender implements ConnectionManager {
   }
 }
 
-export default Sender;
+export default SocketSender;

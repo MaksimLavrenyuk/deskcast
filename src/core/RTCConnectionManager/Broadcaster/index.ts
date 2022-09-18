@@ -1,7 +1,7 @@
-import { ConnectionManager } from './types';
+import { Sender } from '../Sender';
 
 type BroadcasterDeps = {
-  connectionManager: ConnectionManager
+  sender: Sender
 }
 
 type Connections = {
@@ -13,23 +13,18 @@ const PEER_CONNECTION_CONFIG = {
     {
       urls: 'stun:stun.l.google.com:19302',
     },
-    // {
-    //   "urls": "turn:TURN_IP?transport=tcp",
-    //   "username": "TURN_USERNAME",
-    //   "credential": "TURN_CREDENTIALS"
-    // }
   ],
 };
 
 class Broadcaster {
-  private readonly connectionManager: ConnectionManager;
+  private readonly sender: Sender;
 
   private readonly peerConnections: Connections;
 
   private stream: MediaStream | null;
 
   constructor(deps: BroadcasterDeps) {
-    this.connectionManager = deps.connectionManager;
+    this.sender = deps.sender;
     this.peerConnections = {};
     this.stream = null;
 
@@ -41,10 +36,10 @@ class Broadcaster {
     this.disconnectPeerHandler = this.disconnectPeerHandler.bind(this);
     this.dispose = this.dispose.bind(this);
 
-    this.connectionManager.on('answer', this.answerHandler);
-    this.connectionManager.on('watcher', this.watcherHandler);
-    this.connectionManager.on('candidate', this.candidateHandler);
-    this.connectionManager.on('disconnectPeer', this.disconnectPeerHandler);
+    this.sender.on('answer', this.answerHandler);
+    this.sender.on('watcher', this.watcherHandler);
+    this.sender.on('candidate', this.candidateHandler);
+    this.sender.on('disconnectPeer', this.disconnectPeerHandler);
   }
 
   private async answerHandler(id: string, description: RTCSessionDescriptionInit) {
@@ -54,7 +49,6 @@ class Broadcaster {
   }
 
   private async watcherHandler(id: string) {
-    console.log('watcherHandler');
     const peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
 
     this.peerConnections[id] = peerConnection;
@@ -69,12 +63,12 @@ class Broadcaster {
 
     const sdp = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(sdp);
-    this.connectionManager.offer(id, peerConnection.localDescription);
+    this.sender.offer(id, peerConnection.localDescription);
   }
 
   private iceCandidateHandler(id: string, event: RTCPeerConnectionIceEventInit) {
     if (event.candidate) {
-      this.connectionManager.candidate(id, event.candidate);
+      this.sender.candidate(id, event.candidate);
     }
   }
 
@@ -95,11 +89,11 @@ class Broadcaster {
 
   public attachStream(stream: MediaStream) {
     this.stream = stream;
-    this.connectionManager.broadcaster();
+    this.sender.broadcaster();
   }
 
   public dispose() {
-    this.connectionManager.close();
+    this.sender.close();
   }
 }
 
