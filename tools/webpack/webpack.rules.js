@@ -4,6 +4,10 @@ const isDevelopment = inDev();
 
 module.exports = [
   {
+    test: /\.html$/i,
+    loader: 'html-loader',
+  },
+  {
     // Add support for native node modules
     test: /\.node$/,
     use: 'node-loader',

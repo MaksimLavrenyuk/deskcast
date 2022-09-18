@@ -30,6 +30,8 @@
     }
   },
   "rules": {
+    "react/display-name": "off",
+    "jsx-a11y/media-has-caption": "off",
     "import/no-extraneous-dependencies": "off",
     "max-len": ["warn", {
       "ignoreStrings": true,
