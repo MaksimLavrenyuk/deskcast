@@ -24,7 +24,6 @@ function VideoSelector(props: VideoSelectorProps) {
   });
 
   const selectHandler: React.ReactEventHandler<HTMLSelectElement> = async (event) => {
-    console.log('fvfvfv');
     const video = await streamManager.getStream(event.currentTarget.value);
 
     if (video) onSelect(video);

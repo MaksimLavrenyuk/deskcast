@@ -5,8 +5,12 @@ type WatcherDeps = {
   receiver: Receiver,
 }
 
+export type StreamHandler = {
+  (stream: MediaStream): void
+}
+
 export type WatcherEvents = {
-  stream(stream: MediaStream): void
+  stream: StreamHandler
 }
 
 const PEER_CONNECTION_CONFIG = {

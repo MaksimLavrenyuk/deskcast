@@ -30,6 +30,7 @@
     }
   },
   "rules": {
+    "class-methods-use-this": "off",
     "react/display-name": "off",
     "jsx-a11y/media-has-caption": "off",
     "import/no-extraneous-dependencies": "off",

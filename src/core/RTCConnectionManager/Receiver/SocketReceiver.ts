@@ -12,8 +12,8 @@ class SocketReceiver implements Receiver {
 
   private wasConnected: boolean;
 
-  constructor() {
-    this.socket = io('ws://192.168.1.241:4002');
+  constructor(uri: string) {
+    this.socket = io(uri);
     this.eventEmitter = new StrictEventEmitter();
     this.connectionID = null;
     this.wasConnected = false;

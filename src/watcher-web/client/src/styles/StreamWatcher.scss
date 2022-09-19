@@ -1,0 +1,41 @@
+.stream-watcher {
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.stream-watcher__video {
+  width: 100%;
+  height: 100%;
+}
+
+.stream-watcher__waiting {
+  font-size: 3rem;
+  text-align: center;
+  color: #fff;
+}
+
+
+.stream-watcher__expand-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  bottom: 20px;
+  right: 20px;
+}
+
+.stream-watcher__expand-btn svg {
+  width: 48px;
+  height: 48px;
+  fill: #fff;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.stream-watcher__expand-btn svg:hover {
+  transform: scale(1.1);
+}

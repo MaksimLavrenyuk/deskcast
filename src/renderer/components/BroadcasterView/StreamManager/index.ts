@@ -5,10 +5,10 @@ class StreamManagerImpl implements StreamManager {
 
   constructor() {
     this.videoConfig = {
-      minWidth: 1280,
-      maxWidth: 1280,
-      minHeight: 720,
-      maxHeight: 720,
+      minWidth: window.screen.width,
+      maxWidth: window.screen.width,
+      minHeight: window.screen.height,
+      maxHeight: window.screen.height,
     };
   }
 
