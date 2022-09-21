@@ -1,5 +1,5 @@
-import { SourceCollector, Source } from '../types';
-import { IpcRendererManager } from '../../../utils/IpcManager/types';
+import { SourceCollector, Source } from '../../../../core/SourceCollector/types';
+import { IpcRendererManager } from '../../../../utils';
 
 export default class RendererCapturer implements SourceCollector {
   private readonly sourcesWaiter: Promise<Source[]>;

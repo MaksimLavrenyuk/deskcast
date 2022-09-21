@@ -1,4 +1,5 @@
 export type SenderEvents = {
+  connectToManager(): void
   disconnectPeer(id: string): void
   candidate(id: string, candidate: RTCIceCandidateInit): void
   answer(id: string, description: RTCSessionDescriptionInit): void

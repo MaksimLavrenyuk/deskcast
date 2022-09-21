@@ -1,15 +1,15 @@
 import { io, Socket } from 'socket.io-client';
 import { StrictEventEmitter } from 'strict-event-emitter';
-import { SenderEvents, Sender } from './index';
-import { ManagerToSenderEvents, SenderToManagerEvents } from '../types';
+import { SenderEvents, Sender } from '../index';
+import { ManagerToSenderEvents, SenderToManagerEvents } from '../../types';
 
 class SocketSender implements Sender {
   private socket: Socket<ManagerToSenderEvents, SenderToManagerEvents>;
 
   private eventEmitter: StrictEventEmitter<SenderEvents>;
 
-  constructor() {
-    this.socket = io('ws://localhost:4002');
+  constructor(uri: string) {
+    this.socket = io(uri);
     this.eventEmitter = new StrictEventEmitter();
     this.answerHandler = this.answerHandler.bind(this);
     this.watcherHandler = this.watcherHandler.bind(this);
@@ -20,11 +20,16 @@ class SocketSender implements Sender {
     this.on = this.on.bind(this);
     this.close = this.close.bind(this);
 
+    this.socket.on('connect', this.connectHandler);
     this.socket.on('answer', this.answerHandler);
     this.socket.on('watcher', this.watcherHandler);
     this.socket.on('candidate', this.candidateHandler);
     this.socket.on('disconnectPeer', this.disconnectPeerHandler);
   }
+
+  private connectHandler = () => {
+    this.eventEmitter.emit('connectToManager');
+  };
 
   private answerHandler(id: string, description: RTCSessionDescriptionInit) {
     this.eventEmitter.emit('answer', id, description);
