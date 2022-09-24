@@ -77,15 +77,21 @@ class SocketConnectionManager {
   private senderConnectionHandler = (socket: SenderSocket) => {
     this.senderSocket = socket;
 
-    this.senderSocket.on('broadcaster', () => {
+    socket.on('broadcaster', () => {
       this.receiverSockets.forEach((receiver) => {
         receiver.emit('broadcaster');
       });
     });
-    this.senderSocket.on('offer', (id, description) => {
+    socket.on('offer', (id, description) => {
       const receiver = this.receiverSockets.get(id);
 
       receiver.emit('offer', description);
+    });
+
+    this.senderSocket.on('disconnect', () => {
+      this.receiverSockets.forEach((receiver) => {
+        receiver.emit('closeBroadcast');
+      });
     });
   };
 

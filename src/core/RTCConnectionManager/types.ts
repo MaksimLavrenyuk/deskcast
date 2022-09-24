@@ -18,6 +18,7 @@ export type ReceiverToManagerEvents = {
 }
 
 export type ManagerToReceiverEvents = {
+  closeBroadcast: () => void
   broadcaster: () => void
   offer: (description: RTCSessionDescriptionInit) => void;
 }

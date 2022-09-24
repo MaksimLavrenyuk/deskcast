@@ -74,4 +74,14 @@ describe('Socket receiver testing', () => {
     serverSocket.on('watcher', mockWatcherHandler);
     serverSocket.emit('broadcaster');
   });
+
+  it('Broadcast termination processing', (done) => {
+    const mockCloseBroadcasterHandler = jest.fn(() => {
+      expect(mockCloseBroadcasterHandler).toBeCalled();
+      done();
+    });
+
+    socketReceiver.on('closeBroadcast', mockCloseBroadcasterHandler);
+    serverSocket.emit('closeBroadcast');
+  });
 });

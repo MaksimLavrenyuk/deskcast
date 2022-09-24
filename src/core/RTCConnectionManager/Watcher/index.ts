@@ -11,6 +11,7 @@ export type StreamHandler = {
 
 export type WatcherEvents = {
   stream: StreamHandler
+  closeBroadcast(): void
 }
 
 const PEER_CONNECTION_CONFIG = {
@@ -34,6 +35,7 @@ class Watcher {
     this.eventEmitter = new StrictEventEmitter<WatcherEvents>();
 
     this.connectionReceiver.on('offer', this.offerHandler);
+    this.connectionReceiver.on('closeBroadcast', this.closeBroadcastHandler);
   }
 
   private offerHandler = async (description: RTCSessionDescriptionInit) => {
@@ -49,6 +51,10 @@ class Watcher {
     } catch (e) {
       console.log(e);
     }
+  };
+
+  private closeBroadcastHandler = () => {
+    this.eventEmitter.emit('closeBroadcast');
   };
 
   private trackHandler = (event: RTCTrackEvent) => {

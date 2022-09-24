@@ -6,10 +6,12 @@ import ExpandIcon from '../../icons/expand_maximize_icon.svg';
 
 type State = {
   isActiveStream: boolean;
+  isCloseBroadcast: boolean
 }
 
 const LOCALS = {
-  WAITING: 'broadcast waiting...',
+  WAITING: 'Broadcast waiting...',
+  CLOSE_BROADCAST: 'Broadcast is over',
 };
 
 class StreamWatcher extends Component<unknown, State> {
@@ -38,6 +40,7 @@ class StreamWatcher extends Component<unknown, State> {
 
     this.state = {
       isActiveStream: false,
+      isCloseBroadcast: false,
     };
     this.isFullScreen = false;
     this.watcher = null;
@@ -46,7 +49,7 @@ class StreamWatcher extends Component<unknown, State> {
   }
 
   private streamHandler: StreamHandler = (stream) => {
-    this.setState({ isActiveStream: true });
+    this.setState({ isActiveStream: true, isCloseBroadcast: false });
     this.videoRef.current.srcObject = stream;
   };
 
@@ -68,11 +71,16 @@ class StreamWatcher extends Component<unknown, State> {
     }
   };
 
+  private closeBroadcastHandler = () => {
+    this.setState({ isActiveStream: false, isCloseBroadcast: true });
+  };
+
   private async createWatcher() {
     const connectionUri = await StreamWatcher.requestConnectionUri();
     if (connectionUri) {
       this.watcher = new Watcher({ receiver: new SocketReceiver(connectionUri) });
       this.watcher.addEventListener('stream', this.streamHandler);
+      this.watcher.addEventListener('closeBroadcast', this.closeBroadcastHandler);
     }
   }
 
@@ -86,6 +94,15 @@ class StreamWatcher extends Component<unknown, State> {
     $video.muted = true;
 
     return $video;
+  }
+
+  private CloseBroadcastMessage() {
+    const $msg = document.createElement('div');
+
+    $msg.classList.add('stream-watcher__close-msg');
+    $msg.textContent = LOCALS.CLOSE_BROADCAST;
+
+    return $msg;
   }
 
   private Waiting() {
@@ -108,13 +125,15 @@ class StreamWatcher extends Component<unknown, State> {
   }
 
   public render() {
-    const { isActiveStream } = this.state;
+    const { isActiveStream, isCloseBroadcast } = this.state;
     const $container = document.createElement('div');
     $container.classList.add('stream-watcher');
     this.setContainerRef($container);
 
     if (isActiveStream) {
       $container.append(this.Video(), this.BtnFullScreen());
+    } else if (isCloseBroadcast) {
+      $container.append(this.CloseBroadcastMessage());
     } else {
       $container.append(this.Waiting());
     }

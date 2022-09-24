@@ -13,7 +13,8 @@
   height: 100%;
 }
 
-.stream-watcher__waiting {
+.stream-watcher__waiting,
+.stream-watcher__close-msg {
   font-size: 3rem;
   text-align: center;
   color: #fff;
