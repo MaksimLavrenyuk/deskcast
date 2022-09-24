@@ -65,7 +65,7 @@ describe('Socket receiver testing', () => {
     socketReceiver.answer(mockRTCSessionDescription);
   });
 
-  it('should connect', (done) => {
+  it('Send a preview message after the broadcaster has created the stream', (done) => {
     const mockWatcherHandler = jest.fn(() => {
       expect(mockWatcherHandler).toBeCalled();
       done();

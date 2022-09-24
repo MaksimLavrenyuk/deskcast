@@ -15,45 +15,44 @@ class SocketReceiver implements Receiver {
     this.eventEmitter = new StrictEventEmitter();
     this.wasConnected = false;
 
-    this.offerHandler = this.offerHandler.bind(this);
-    this.close = this.close.bind(this);
-    this.connectHandler = this.connectHandler.bind(this);
-    this.broadcasterHandler = this.broadcasterHandler.bind(this);
-    this.answer = this.answer.bind(this);
-
     this.socket.on('connect', this.connectHandler);
     this.socket.on('offer', this.offerHandler);
     this.socket.on('broadcaster', this.broadcasterHandler);
+    this.viewRequest();
   }
 
-  private offerHandler(description: RTCSessionDescriptionInit) {
+  private offerHandler = (description: RTCSessionDescriptionInit) => {
     this.eventEmitter.emit('offer', description);
-  }
+  };
 
-  private connectHandler() {
+  private connectHandler = () => {
     this.wasConnected = true;
     this.eventEmitter.emit('connectToManager');
-  }
+  };
 
-  private broadcasterHandler() {
+  private broadcasterHandler = () => {
+    this.viewRequest();
+  };
+
+  private viewRequest() {
     this.socket.emit('watcher');
   }
 
-  answer(description: RTCSessionDescription): void {
+  answer = (description: RTCSessionDescription): void => {
     this.socket.emit('answer', description);
-  }
+  };
 
-  candidate(candidate: RTCIceCandidate): void {
+  candidate = (candidate: RTCIceCandidate): void => {
     this.socket.emit('candidate', candidate);
-  }
+  };
 
-  close(): void {
+  close = (): void => {
     this.socket.close();
-  }
+  };
 
-  on<Event extends keyof ReceiverEvents>(event: Event, listener: ReceiverEvents[Event]): void {
+  on = <Event extends keyof ReceiverEvents>(event: Event, listener: ReceiverEvents[Event]): void => {
     this.eventEmitter.on(event, listener);
-  }
+  };
 }
 
 export default SocketReceiver;
