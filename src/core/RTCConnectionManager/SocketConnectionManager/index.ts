@@ -7,7 +7,8 @@ import {
 } from '../types';
 
 type BrockerProps = {
-  port: number
+  senderPort: number
+  receiverPort: number
 }
 
 type ListenEvents = {
@@ -16,82 +17,77 @@ type ListenEvents = {
 
 type EmitEvents = ManagerToSenderEvents & ManagerToReceiverEvents;
 
-type Socket = SocketDefault<ListenEvents, EmitEvents>;
+export type Socket = SocketDefault<ListenEvents, EmitEvents>;
+
+type SenderSocket = SocketDefault<
+  { connection: (socket: SocketDefault) => void } & SenderToManagerEvents,
+  ManagerToSenderEvents>;
+
+type ReceiverSocket = SocketDefault<
+  { connection: (socket: SocketDefault) => void } & ReceiverToManagerEvents,
+  ManagerToReceiverEvents>;
 
 class SocketConnectionManager {
-  private io: Server<ListenEvents, EmitEvents>;
+  private senderSocket: SenderSocket | null;
 
-  private broadcaster: string | null;
+  private readonly receiverSockets: Map<ReceiverSocket['id'], ReceiverSocket>;
 
   constructor(props: BrockerProps) {
-    this.broadcaster = null;
-    this.io = new Server(props.port, {
+    this.senderSocket = null;
+    this.receiverSockets = new Map<ReceiverSocket['id'], ReceiverSocket>();
+    const senderServer = new Server(props.senderPort, {
       cors: {
         origin: '*',
       },
     });
 
-    this.connectionHandler = this.connectionHandler.bind(this);
-    this.createBroadcasterHandler = this.createBroadcasterHandler.bind(this);
-    this.createOfferHandler = this.createOfferHandler.bind(this);
-    this.createAnswerHandler = this.createAnswerHandler.bind(this);
+    const receiverServer = new Server(props.receiverPort, {
+      cors: {
+        origin: '*',
+      },
+    });
 
-    this.io.sockets.on('error', this.errorHandler);
-    this.io.sockets.on('connection', this.connectionHandler);
+    senderServer.sockets.on('error', this.errorHandler);
+    senderServer.sockets.on('connection', this.senderConnectionHandler);
+
+    receiverServer.sockets.on('error', this.errorHandler);
+    receiverServer.sockets.on('connection', this.receiverConnectionHandler);
   }
 
-  private connectionHandler(socket: Socket) {
-    socket.on('broadcaster', this.createBroadcasterHandler(socket));
-    socket.on('watcher', this.createWatcherHandler(socket));
-    socket.on('offer', this.createOfferHandler(socket));
-    socket.on('answer', this.createAnswerHandler(socket));
-    socket.on('candidate', this.createCandidateHandler(socket));
-    socket.on('disconnect', this.createDisconnectHandler(socket));
-  }
+  private receiverConnectionHandler = (socket: ReceiverSocket) => {
+    this.receiverSockets.set(socket.id, socket);
 
-  private createBroadcasterHandler(socket: Socket) {
-    return () => {
-      this.broadcaster = socket.id;
-      socket.broadcast.emit('broadcaster');
-    };
-  }
+    socket.on('watcher', () => {
+      this.senderSocket.emit('watcher', socket.id);
+    });
 
-  private createWatcherHandler(socket: Socket) {
-    return () => {
-      if (this.broadcaster) {
-        socket.to(this.broadcaster).emit('watcher', socket.id);
-      }
-    };
-  }
+    socket.on('disconnect', () => {
+      this.senderSocket.emit('disconnectPeer', socket.id);
+    });
 
-  // eslint-disable-next-line class-methods-use-this
-  private createOfferHandler(socket: Socket) {
-    return (id: string, description: RTCSessionDescription) => {
-      socket.to(id).emit('offer', socket.id, description);
-    };
-  }
+    socket.on('answer', (description) => {
+      this.senderSocket.emit('answer', socket.id, description);
+    });
 
-  // eslint-disable-next-line class-methods-use-this
-  private createAnswerHandler(socket: Socket) {
-    return (id: string, description: RTCSessionDescription) => {
-      socket.to(id).emit('answer', socket.id, description);
-    };
-  }
+    socket.on('candidate', (candidate) => {
+      this.senderSocket.emit('candidate', socket.id, candidate);
+    });
+  };
 
-  // eslint-disable-next-line class-methods-use-this
-  private createCandidateHandler(socket: Socket) {
-    return (id: string, candidate: RTCIceCandidate) => {
-      socket.to(id).emit('candidate', socket.id, candidate);
-    };
-  }
+  private senderConnectionHandler = (socket: SenderSocket) => {
+    this.senderSocket = socket;
 
-  private createDisconnectHandler(socket: Socket) {
-    return () => {
-      if (this.broadcaster) {
-        socket.to(this.broadcaster).emit('disconnectPeer', socket.id);
-      }
-    };
-  }
+    this.senderSocket.on('broadcaster', () => {
+      this.receiverSockets.forEach((receiver) => {
+        receiver.emit('broadcaster');
+      });
+    });
+    this.senderSocket.on('offer', (id, description) => {
+      const receiver = this.receiverSockets.get(id);
+
+      receiver.emit('offer', description);
+    });
+  };
 
   // eslint-disable-next-line class-methods-use-this
   private errorHandler(error: unknown) {

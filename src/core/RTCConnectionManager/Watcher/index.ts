@@ -14,11 +14,11 @@ export type WatcherEvents = {
 }
 
 const PEER_CONNECTION_CONFIG = {
-  iceServers: [
-    {
-      urls: 'stun:stun.l.google.com:19302',
-    },
-  ],
+  // iceServers: [
+  //   {
+  //     urls: 'stun:stun.l.google.com:19302',
+  //   },
+  // ],
 };
 
 class Watcher {
@@ -33,7 +33,6 @@ class Watcher {
     this.peerConnection = null;
     this.eventEmitter = new StrictEventEmitter<WatcherEvents>();
 
-    this.connectionReceiver.on('candidate', this.candidateHandler);
     this.connectionReceiver.on('offer', this.offerHandler);
   }
 
@@ -58,16 +57,6 @@ class Watcher {
 
   private iceCandidateHandler = (event: RTCPeerConnectionIceEvent) => {
     this.connectionReceiver.candidate(event.candidate);
-  };
-
-  private candidateHandler = async (candidateInit: RTCIceCandidateInit) => {
-    try {
-      if (this.peerConnection) {
-        await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidateInit));
-      }
-    } catch (e) {
-      console.log(e);
-    }
   };
 
   public addEventListener = <Event extends keyof WatcherEvents>(event: Event, listener: WatcherEvents[Event]) => {

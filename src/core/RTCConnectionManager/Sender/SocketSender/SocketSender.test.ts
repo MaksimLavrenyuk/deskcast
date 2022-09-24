@@ -1,53 +1,12 @@
 import { createServer } from 'http';
 import { Server, Socket as ServerSocket } from 'socket.io';
-import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import SocketSender from './index';
-
-const candidateMock: RTCIceCandidate = {
-  address: null,
-  candidate: 'candidate',
-  component: null,
-  foundation: null,
-  port: null,
-  priority: null,
-  protocol: null,
-  relatedAddress: null,
-  relatedPort: null,
-  sdpMLineIndex: null,
-  sdpMid: null,
-  tcpType: null,
-  type: null,
-  usernameFragment: null,
-  toJSON() {
-    return {
-      candidate: 'candidate',
-      sdpMLineIndex: null,
-      sdpMid: null,
-      usernameFragment: null,
-    };
-  },
-};
-
-const mockRTCSessionDescription: RTCSessionDescription = {
-  sdp: 'sdp',
-  type: 'offer',
-  toJSON() {
-    return {
-      sdp: 'sdp',
-      type: 'offer',
-    };
-  },
-};
-
-const mockDescriptionInit: RTCSessionDescriptionInit = {
-  type: 'answer',
-};
+import { mockCandidate, mockRTCSessionDescription, mockDescriptionInit } from '../../mocks/webrtc';
 
 describe('Socket sender testing', () => {
-  const watcherID = 'watcher-1234';
+  const receiverID = 'watcher-1234';
   let ioServer: Server;
   let serverSocket: ServerSocket;
-  let clientSocket: ClientSocket;
   let socketSender: SocketSender;
 
   beforeAll((done) => {
@@ -61,10 +20,8 @@ describe('Socket sender testing', () => {
 
       if (typeof address === 'string') {
         uri = `http://localhost:${address}`;
-        clientSocket = Client(uri);
       } else {
         uri = `http://localhost:${address.port}`;
-        clientSocket = Client(uri);
       }
 
       ioServer.on('connection', (socket) => {
@@ -78,42 +35,42 @@ describe('Socket sender testing', () => {
 
   afterAll(() => {
     ioServer.close();
-    clientSocket.close();
+    socketSender.close();
   });
 
   it('Receiving events about the connected watcher', (done) => {
     socketSender.on('watcher', (arg) => {
-      expect(arg).toBe(watcherID);
+      expect(arg).toBe(receiverID);
       done();
     });
-    serverSocket.emit('watcher', watcherID);
+    serverSocket.emit('watcher', receiverID);
   });
 
   it('Receiving an event about the disconnection of the watcher', (done) => {
     socketSender.on('disconnectPeer', (arg) => {
-      expect(arg).toBe(watcherID);
+      expect(arg).toBe(receiverID);
       done();
     });
-    serverSocket.emit('disconnectPeer', watcherID);
+    serverSocket.emit('disconnectPeer', receiverID);
   });
 
   it('RTCIceCandidateInit API WebRTC dictionary get event', (done) => {
     socketSender.on('candidate', (id, candidate) => {
-      expect(id).toBe(watcherID);
-      expect(candidate.candidate === candidateMock.candidate);
+      expect(id).toBe(receiverID);
+      expect(candidate.candidate === mockCandidate.candidate);
       done();
     });
-    serverSocket.emit('candidate', watcherID, candidateMock);
+    serverSocket.emit('candidate', receiverID, mockCandidate);
   });
 
   it('getting sdp data', (done) => {
     socketSender.on('answer', (id, candidate) => {
-      expect(id).toBe(watcherID);
+      expect(id).toBe(receiverID);
       expect(candidate.type === mockDescriptionInit.type);
       done();
     });
 
-    serverSocket.emit('answer', watcherID, mockDescriptionInit);
+    serverSocket.emit('answer', receiverID, mockDescriptionInit);
   });
 
   it('Notify the master of the creation of the broadcaster', (done) => {
@@ -128,22 +85,22 @@ describe('Socket sender testing', () => {
 
   it('sending an offer for RTCSessionDescription', (done) => {
     serverSocket.on('offer', (id, description) => {
-      expect(id).toBe(watcherID);
+      expect(id).toBe(receiverID);
       expect(description.type).toBe(mockRTCSessionDescription.type);
       done();
     });
 
-    socketSender.offer(watcherID, mockRTCSessionDescription);
+    socketSender.offer(receiverID, mockRTCSessionDescription);
   });
 
   it('sending an candidate for RTCIceCandidate', (done) => {
     serverSocket.on('candidate', (id, description) => {
-      expect(id).toBe(watcherID);
-      expect(description.candidate).toBe(candidateMock.candidate);
+      expect(id).toBe(receiverID);
+      expect(description.candidate).toBe(mockCandidate.candidate);
       done();
     });
 
-    socketSender.candidate(watcherID, candidateMock);
+    socketSender.candidate(receiverID, mockCandidate);
   });
 
   it('connection closing', (done) => {

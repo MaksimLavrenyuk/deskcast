@@ -31,7 +31,7 @@ class SocketSender implements Sender {
     this.eventEmitter.emit('connectToManager');
   };
 
-  private answerHandler(id: string, description: RTCSessionDescriptionInit) {
+  private answerHandler(id: string, description: RTCSessionDescription) {
     this.eventEmitter.emit('answer', id, description);
   }
 

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Watcher, { StreamHandler } from '../../../../../core/RTCConnectionManager/Watcher';
-import SocketReceiver from '../../../../../core/RTCConnectionManager/Receiver/SocketReceiver';
+import SocketReceiver from '../../../../../core/RTCConnectionManager/Receiver/SocketReceiver/SocketReceiver';
 import Component from '../Component';
 import ExpandIcon from '../../icons/expand_maximize_icon.svg';
 
@@ -15,7 +15,7 @@ const LOCALS = {
 class StreamWatcher extends Component<unknown, State> {
   private static async requestConnectionUri(): Promise<string | null> {
     try {
-      const response = await axios.get('/connection_uri');
+      const response = await axios.get('/connection_receiver_uri');
 
       if (response.data) {
         return response.data.url;

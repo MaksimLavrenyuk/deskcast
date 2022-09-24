@@ -12,12 +12,12 @@ export type ManagerToSenderEvents = {
 }
 
 export type ReceiverToManagerEvents = {
-  answer: (id: string, description: RTCSessionDescription) => void;
-  candidate: (id: string, candidate: RTCIceCandidate) => void
+  answer: (description: RTCSessionDescription) => void;
+  candidate: (candidate: RTCIceCandidate) => void
   watcher: () => void
 }
 
 export type ManagerToReceiverEvents = {
   broadcaster: () => void
-  offer: (id: string, description: RTCSessionDescriptionInit) => void;
+  offer: (description: RTCSessionDescriptionInit) => void;
 }
