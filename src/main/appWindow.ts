@@ -3,10 +3,13 @@ import {
 } from 'electron';
 import path from 'path';
 import IpcMainManager from '../utils/IpcManager/IpcMainManager';
+import WatcherServer from '../watcher-web/server';
 
 // Electron Forge automatically creates these entry points
 declare const APP_WINDOW_WEBPACK_ENTRY: string;
 declare const APP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+const watcherServer = new WatcherServer();
 
 /**
  * Register Inter Process Communication
@@ -32,6 +35,10 @@ function registerMainIPC(appWindow: BrowserWindow) {
 
     ipcMainMannager.send('DESKTOP_CAPTURE_SOURCES', { sources: sourcesData });
   });
+
+  ipcMainMannager.on('GET_WATCHER_LINK', () => {
+    ipcMainMannager.send('WATCHER_LINK', { link: watcherServer.getWatcherServerLink() });
+  });
 }
 
 /**
@@ -41,8 +48,8 @@ function registerMainIPC(appWindow: BrowserWindow) {
 export default function createAppWindow(): BrowserWindow {
   // Create new window instance
   let appWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 1200,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',

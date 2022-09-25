@@ -8,6 +8,7 @@ import SocketSender from '../../../core/RTCConnectionManager/Sender/SocketSender
 import StreamManager from './StreamManager';
 import RendererCapturer from './RendererCapturer';
 import IpcRendererManager from '../../../utils/IpcManager/IpcRendererManager';
+import StartScreen from './StartScreen';
 
 function BroadcasterView() {
   const [video, setVideo] = useState<MediaStream | null>(null);
@@ -23,12 +24,19 @@ function BroadcasterView() {
 
   return (
     <>
-      <VideoViewer video={video} />
-      <VideoSelector
-        onSelect={selectHandler}
-        streamManager={streamManager}
-        sourceCollector={sourceCollector}
-      />
+      {!video && (
+        <StartScreen />
+      )}
+      {video && (
+        <>
+          <VideoViewer video={video} />
+          <VideoSelector
+            onSelect={selectHandler}
+            streamManager={streamManager}
+            sourceCollector={sourceCollector}
+          />
+        </>
+      )}
     </>
   );
 }

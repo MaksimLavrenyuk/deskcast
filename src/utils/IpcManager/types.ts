@@ -1,5 +1,6 @@
 export type FromRendererToMainEvents = {
   GET_DESKTOP_CAPTURE_SOURCES: void
+  GET_WATCHER_LINK: void
 }
 
 export type FromMainToRendererEvents = {
@@ -8,6 +9,9 @@ export type FromMainToRendererEvents = {
       id: string,
       name: string
     }[]
+  },
+  WATCHER_LINK: {
+    link: string
   }
 }
 

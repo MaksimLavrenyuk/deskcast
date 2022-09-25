@@ -29,9 +29,7 @@ function Application() {
   }, [darkTheme]);
 
   return (
-    <div>
-      <BroadcasterView />
-    </div>
+    <BroadcasterView />
   );
 }
 
