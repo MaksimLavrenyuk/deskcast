@@ -14,12 +14,11 @@ type VideoSelectorProps = {
 
 function VideoSelector(props: VideoSelectorProps) {
   const { onSelect, streamManager, sourceCollector } = props;
-  const [sources, setSources] = useState<Source[]>([]);
+  const [screens, setScreens] = useState<MediaStream[]>([]);
 
   useEffect(() => {
     (async () => {
       const sourcesList = await sourceCollector.sources();
-      setSources(sourcesList);
     })();
   });
 
@@ -31,9 +30,9 @@ function VideoSelector(props: VideoSelectorProps) {
 
   return (
     <select onChange={selectHandler}>
-      {sources.map((source) => (
-        <option key={source.id} value={source.id}>{source.name}</option>
-      ))}
+      {/* {sources.map((source) => ( */}
+      {/*   <option key={source.id} value={source.id}>{source.name}</option> */}
+      {/* ))} */}
     </select>
   );
 }

@@ -1,19 +1,14 @@
 import React, {
   useCallback, useMemo, memo, useState,
 } from 'react';
-import VideoSelector, { SelectHandler } from './VideoSelector';
+import { SelectHandler } from './VideoSelector';
 import VideoViewer from './VideoViewer';
 import Broadcaster from '../../../core/RTCConnectionManager/Broadcaster';
 import SocketSender from '../../../core/RTCConnectionManager/Sender/SocketSender';
-import StreamManager from './StreamManager';
-import RendererCapturer from './RendererCapturer';
-import IpcRendererManager from '../../../utils/IpcManager/IpcRendererManager';
 import StartScreen from './StartScreen';
 
 function BroadcasterView() {
   const [video, setVideo] = useState<MediaStream | null>(null);
-  const streamManager = useMemo(() => new StreamManager(), []);
-  const sourceCollector = useMemo(() => new RendererCapturer(IpcRendererManager.get()), []);
   const broadcaster = useMemo(() => new Broadcaster({ sender: new SocketSender('ws://localhost:4002') }), []);
 
   const selectHandler: SelectHandler = useCallback((stream) => {
@@ -25,16 +20,16 @@ function BroadcasterView() {
   return (
     <>
       {!video && (
-        <StartScreen />
+        <StartScreen onSelectScreen={selectHandler} />
       )}
       {video && (
         <>
           <VideoViewer video={video} />
-          <VideoSelector
-            onSelect={selectHandler}
-            streamManager={streamManager}
-            sourceCollector={sourceCollector}
-          />
+          {/* <VideoSelector */}
+          {/*   onSelect={selectHandler} */}
+          {/*   streamManager={streamManager} */}
+          {/*   sourceCollector={sourceCollector} */}
+          {/* /> */}
         </>
       )}
     </>
