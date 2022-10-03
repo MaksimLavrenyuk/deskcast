@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useRef } from 'react';
+import classes from './VideoViewer.module.scss';
 
 type VideoViewerProps = {
   video: MediaStream | null
@@ -24,9 +25,11 @@ function VideoViewer(props: VideoViewerProps) {
   }, [video]);
 
   return (
-    video
-      ? <video ref={videoRef} />
-      : <EmptyVideoMsg />
+    <div className={classes.videoContainer}>
+      { video
+        ? <video ref={videoRef} />
+        : <EmptyVideoMsg />}
+    </div>
   );
 }
 

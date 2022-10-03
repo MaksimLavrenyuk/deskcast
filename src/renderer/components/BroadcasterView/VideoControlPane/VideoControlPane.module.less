@@ -1,0 +1,61 @@
+@import "antd/lib/style/themes/default";
+@import "antd/lib/style/themes/dark";
+
+@display: block;
+
+.pane {
+  display: @display;
+  width: fit-content;
+  border-radius: @border-radius-base;
+  padding: @control-padding-horizontal;
+  border: @border-width-base @border-style-base @border-color-base;
+  box-shadow: @shadow-2;
+  background-color: rgba(0, 0, 0, 0.75);
+
+  &.show {
+    animation: 1s 1 normal slideInUp;
+    animation-fill-mode: forwards;
+    //display: block;
+  }
+
+  &.hidden {
+    animation: 1s 1 normal slideOutDown;
+    animation-fill-mode: forwards;
+    //display: none;
+  }
+}
+
+
+.btnSpace {
+  margin-right: @margin-sm;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translate3d(0, 100%, 0);
+    visibility: visible;
+    opacity: 0;
+    display: none;
+  }
+
+  to {
+    display: @display;
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    display: @display;
+  }
+
+  to {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(0, 100%, 0);
+    display: none;
+  }
+}
