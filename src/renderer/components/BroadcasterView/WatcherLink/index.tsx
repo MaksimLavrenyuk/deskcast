@@ -1,8 +1,7 @@
 import React, {
   memo, useState, useEffect, useMemo,
 } from 'react';
-import { Typography, Skeleton, Button } from 'antd';
-import { CopyOutlined } from '@ant-design/icons';
+import { Typography, Skeleton } from 'antd';
 import classes from './WatcherLink.module.scss';
 import WatcherLinkGetter from './WatcherLinkGetter';
 import IpcRendererManager from '../../../../utils/IpcManager/IpcRendererManager';
