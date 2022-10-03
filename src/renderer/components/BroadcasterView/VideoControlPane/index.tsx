@@ -3,8 +3,9 @@ import React, {
 } from 'react';
 import { Button, Tooltip, Popconfirm } from 'antd';
 import { debounce } from 'lodash';
-import { SelectOutlined, CloseOutlined, LinkOutlined } from '@ant-design/icons';
+import { SelectOutlined, CloseOutlined } from '@ant-design/icons';
 import classes from './VideoControlPane.module.less';
+import BroadcastLinkBtn from './BroadcastLinkBtn';
 
 type VideoControlPaneProps = {
   requestChangeScreen(): void
@@ -26,7 +27,7 @@ function moveMouseHandler(
     }
 
     timeoutID = window.setTimeout(onStop, 2000);
-  }, 100);
+  }, 50);
 
   window.addEventListener('mousemove', mouseMoveHandler);
 
@@ -41,11 +42,9 @@ function VideoControlPane(props: VideoControlPaneProps) {
   const [show, toggle] = useState(true);
 
   const moveCursorHandler = useCallback(() => {
-    console.log('move');
     toggle(true);
   }, []);
   const stopCursorHandler = useCallback(() => {
-    console.log('stop');
     toggle(false);
   }, []);
 
@@ -59,16 +58,7 @@ function VideoControlPane(props: VideoControlPaneProps) {
 
   return (
     <div className={`${classes.pane} ${className} ${show ? `animate__slideInUp ${classes.show}` : `animate__slideOutDown ${classes.hidden}`}`}>
-      <Tooltip placement="top" title="Link to the broadcast">
-        <Button
-          className={classes.btnSpace}
-          onClick={requestChangeScreen}
-          type="primary"
-          shape="circle"
-          icon={<LinkOutlined />}
-          size="large"
-        />
-      </Tooltip>
+      <BroadcastLinkBtn className={classes.btnSpace} />
       <Tooltip placement="top" title="Select another screen">
         <Button
           className={classes.btnSpace}

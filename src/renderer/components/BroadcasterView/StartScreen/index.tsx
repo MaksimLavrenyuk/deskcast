@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from 'antd';
 import classes from './StartScreen.module.scss';
 import WatcherLink from '../WatcherLink';
+import WatcherLinkPane from './WatcherLinkPane';
 
 type StartScreenProps = {
   onStart(): void
@@ -13,7 +14,9 @@ function StartScreen(props: StartScreenProps) {
   return (
     <div className={classes.container}>
       <Button onClick={onStart} type="primary" size="large">Start broadcasting</Button>
-      <WatcherLink className={classes.link} />
+      <WatcherLinkPane className={classes.link}>
+        <WatcherLink />
+      </WatcherLinkPane>
     </div>
   );
 }

@@ -7,15 +7,7 @@ import WatcherLinkGetter from './WatcherLinkGetter';
 import IpcRendererManager from '../../../../utils/IpcManager/IpcRendererManager';
 import CopyBtn from '../../CopyBtn';
 
-type WatcherLinkProps = {
-  className?: string
-}
-
-function WatcherLink(props: WatcherLinkProps) {
-  const {
-    className = '',
-  } = props;
-
+function WatcherLink() {
   const linkGetter = useMemo(() => new WatcherLinkGetter(IpcRendererManager.get()), []);
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState<string | null>(null);
@@ -32,8 +24,7 @@ function WatcherLink(props: WatcherLinkProps) {
   }, [linkGetter]);
 
   return (
-    <div className={`${classes.container} ${className}`}>
-      <Typography.Title level={5}>Broadcast link</Typography.Title>
+    <>
       {!loading && link && (
         <div className={classes.link_container}>
           <div className={classes.link}>{link}</div>
@@ -43,7 +34,7 @@ function WatcherLink(props: WatcherLinkProps) {
       {loading && !link && (
         <Skeleton loading={loading} active />
       )}
-    </div>
+    </>
   );
 }
 
