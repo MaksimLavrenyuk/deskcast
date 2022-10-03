@@ -2,6 +2,7 @@
 @import "antd/lib/style/themes/dark";
 
 @display: block;
+@animationTime: 0.3s;
 
 .pane {
   display: @display;
@@ -13,15 +14,13 @@
   background-color: rgba(0, 0, 0, 0.75);
 
   &.show {
-    animation: 1s 1 normal slideInUp;
+    animation: @animationTime 1 normal slideInUp;
     animation-fill-mode: forwards;
-    //display: block;
   }
 
   &.hidden {
-    animation: 1s 1 normal slideOutDown;
+    animation: @animationTime 1 normal slideOutDown;
     animation-fill-mode: forwards;
-    //display: none;
   }
 }
 

@@ -2,7 +2,7 @@ import React, {
   memo, useCallback, useEffect, useState,
 } from 'react';
 import { Button, Tooltip, Popconfirm } from 'antd';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import { SelectOutlined, CloseOutlined } from '@ant-design/icons';
 import classes from './VideoControlPane.module.less';
 import BroadcastLinkBtn from './BroadcastLinkBtn';
@@ -19,7 +19,7 @@ function moveMouseHandler(
 ) {
   let timeoutID: null | number = null;
 
-  const mouseMoveHandler = debounce(() => {
+  const mouseMoveHandler = throttle(() => {
     if (timeoutID) {
       onMove();
       clearTimeout(timeoutID);
