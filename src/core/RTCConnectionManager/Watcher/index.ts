@@ -11,6 +11,7 @@ export type StreamHandler = {
 
 export type WatcherEvents = {
   stream: StreamHandler
+  cancelBroadcast(): void
   closeBroadcast(): void
 }
 
@@ -36,6 +37,7 @@ class Watcher {
 
     this.connectionReceiver.on('offer', this.offerHandler);
     this.connectionReceiver.on('closeBroadcast', this.closeBroadcastHandler);
+    this.connectionReceiver.on('cancelBroadcast', this.cancelBroadcastHandler);
   }
 
   private offerHandler = async (description: RTCSessionDescriptionInit) => {
@@ -55,6 +57,11 @@ class Watcher {
 
   private closeBroadcastHandler = () => {
     this.eventEmitter.emit('closeBroadcast');
+  };
+
+  private cancelBroadcastHandler = () => {
+    this.eventEmitter.emit('cancelBroadcast');
+    this.peerConnection = null;
   };
 
   private trackHandler = (event: RTCTrackEvent) => {

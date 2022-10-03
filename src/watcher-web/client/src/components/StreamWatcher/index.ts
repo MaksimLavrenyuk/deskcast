@@ -75,12 +75,17 @@ class StreamWatcher extends Component<unknown, State> {
     this.setState({ isActiveStream: false, isCloseBroadcast: true });
   };
 
+  private cancelBroadcastHandler = () => {
+    this.setState({ isActiveStream: false, isCloseBroadcast: false });
+  };
+
   private async createWatcher() {
     const connectionUri = await StreamWatcher.requestConnectionUri();
     if (connectionUri) {
       this.watcher = new Watcher({ receiver: new SocketReceiver(connectionUri) });
       this.watcher.addEventListener('stream', this.streamHandler);
       this.watcher.addEventListener('closeBroadcast', this.closeBroadcastHandler);
+      this.watcher.addEventListener('cancelBroadcast', this.cancelBroadcastHandler);
     }
   }
 

@@ -20,6 +20,10 @@ function BroadcasterView() {
     setOpenSelector(false);
     broadcaster.attachStream(stream);
   }, [broadcaster]);
+  const cancelStreamHandler = useCallback(() => {
+    setVideo(null);
+    broadcaster.cancelStream();
+  }, [broadcaster]);
 
   const selectScreenRequestHandler = useCallback(() => {
     setOpenSelector(true);
@@ -39,7 +43,7 @@ function BroadcasterView() {
           <VideoControlPane
             className={classes.controlPane}
             requestChangeScreen={selectScreenRequestHandler}
-            onCancelStream={() => console.log('dd')}
+            onCancelStream={cancelStreamHandler}
           />
         </>
       )}

@@ -92,6 +92,11 @@ class Broadcaster {
     this.sender.broadcaster();
   }
 
+  public cancelStream = () => {
+    this.stream = null;
+    this.sender.cancel();
+  };
+
   public dispose() {
     this.sender.close();
   }

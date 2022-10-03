@@ -63,6 +63,10 @@ class SocketSender implements Sender {
     this.socket.emit('broadcaster');
   }
 
+  public cancel = () => {
+    this.socket.emit('cancel');
+  };
+
   public close() {
     this.socket.close();
   }

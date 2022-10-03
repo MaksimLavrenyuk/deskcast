@@ -1,4 +1,5 @@
 export type SenderToManagerEvents = {
+  cancel: () => void
   offer: (id: string, description: RTCSessionDescription) => void;
   candidate: (id: string, candidate: RTCIceCandidate) => void
   broadcaster: () => void
@@ -18,6 +19,7 @@ export type ReceiverToManagerEvents = {
 }
 
 export type ManagerToReceiverEvents = {
+  cancelBroadcast: () => void
   closeBroadcast: () => void
   broadcaster: () => void
   offer: (description: RTCSessionDescriptionInit) => void;

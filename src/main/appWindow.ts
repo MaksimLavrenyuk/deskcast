@@ -4,6 +4,7 @@ import {
 import path from 'path';
 import IpcMainManager from '../utils/IpcManager/IpcMainManager';
 import WatcherServer from '../watcher-web/server';
+import { inDev } from '../common/helpers';
 
 // Electron Forge automatically creates these entry points
 declare const APP_WINDOW_WEBPACK_ENTRY: string;
@@ -15,14 +16,14 @@ const watcherServer = new WatcherServer();
  * Register Inter Process Communication
  */
 function registerMainIPC(appWindow: BrowserWindow) {
-  const ipcMainMannager = new IpcMainManager(ipcMain, appWindow);
+  const ipcMainManager = new IpcMainManager(ipcMain, appWindow);
 
   /**
    * Here you can assign IPC related codes for the application window
    * to Communicate asynchronously from the main process to renderer processes.
    */
 
-  ipcMainMannager.on('GET_DESKTOP_CAPTURE_SOURCES', async () => {
+  ipcMainManager.on('GET_DESKTOP_CAPTURE_SOURCES', async () => {
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
     const sourcesData = [];
 
@@ -33,11 +34,11 @@ function registerMainIPC(appWindow: BrowserWindow) {
       });
     }
 
-    ipcMainMannager.send('DESKTOP_CAPTURE_SOURCES', { sources: sourcesData });
+    ipcMainManager.send('DESKTOP_CAPTURE_SOURCES', { sources: sourcesData });
   });
 
-  ipcMainMannager.on('GET_WATCHER_LINK', () => {
-    ipcMainMannager.send('WATCHER_LINK', { link: watcherServer.getWatcherServerLink() });
+  ipcMainManager.on('GET_WATCHER_LINK', () => {
+    ipcMainManager.send('WATCHER_LINK', { link: watcherServer.getWatcherServerLink() });
   });
 }
 
@@ -65,7 +66,8 @@ export default function createAppWindow(): BrowserWindow {
 
   // Load the index.html of the app window.
   appWindow.loadURL(APP_WINDOW_WEBPACK_ENTRY);
-  appWindow.webContents.openDevTools();
+
+  if (inDev()) appWindow.webContents.openDevTools();
 
   // Show window when its ready to
   appWindow.on('ready-to-show', () => appWindow.show());

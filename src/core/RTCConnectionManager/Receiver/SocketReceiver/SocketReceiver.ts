@@ -19,6 +19,7 @@ class SocketReceiver implements Receiver {
     this.socket.on('offer', this.offerHandler);
     this.socket.on('broadcaster', this.broadcasterHandler);
     this.socket.on('closeBroadcast', this.closeBroadcastHandler);
+    this.socket.on('cancelBroadcast', this.cancelBroadcastHandler);
     this.viewRequest();
   }
 
@@ -37,6 +38,10 @@ class SocketReceiver implements Receiver {
 
   private closeBroadcastHandler = () => {
     this.eventEmitter.emit('closeBroadcast');
+  };
+
+  private cancelBroadcastHandler = () => {
+    this.eventEmitter.emit('cancelBroadcast');
   };
 
   private viewRequest() {

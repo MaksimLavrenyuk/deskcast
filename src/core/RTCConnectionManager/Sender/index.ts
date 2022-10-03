@@ -10,6 +10,7 @@ export interface Sender {
   offer(id: string, description: RTCSessionDescription): void
   candidate(id: string, candidate: RTCIceCandidate): void
   on<Event extends keyof SenderEvents>(event: Event, listener: SenderEvents[Event]): void
+  cancel(): void
   close(): void
   broadcaster(): void
 }

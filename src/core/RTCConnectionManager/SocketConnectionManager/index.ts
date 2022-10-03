@@ -88,6 +88,12 @@ class SocketConnectionManager {
       receiver.emit('offer', description);
     });
 
+    socket.on('cancel', () => {
+      this.receiverSockets.forEach((receiver) => {
+        receiver.emit('cancelBroadcast');
+      });
+    });
+
     this.senderSocket.on('disconnect', () => {
       this.receiverSockets.forEach((receiver) => {
         receiver.emit('closeBroadcast');

@@ -1,4 +1,5 @@
 export type ReceiverEvents = {
+  cancelBroadcast(): void
   connectToManager(): void
   closeBroadcast(): void
   offer(description: RTCSessionDescriptionInit): void
