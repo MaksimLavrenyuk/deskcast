@@ -1,8 +1,8 @@
 import React, {
   memo, useState, useEffect, useMemo,
 } from 'react';
-import { Typography, Skeleton } from 'antd';
-import classes from './WatcherLink.module.scss';
+import { Skeleton } from 'antd';
+import classes from './WatcherLink.module.less';
 import WatcherLinkGetter from './WatcherLinkGetter';
 import IpcRendererManager from '../../../../utils/IpcManager/IpcRendererManager';
 import CopyBtn from '../../CopyBtn';

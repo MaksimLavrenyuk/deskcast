@@ -1,6 +1,6 @@
 import { Typography } from 'antd';
 import React, { ReactNode, memo } from 'react';
-import classes from './WatcherLinkPane.module.scss';
+import classes from './WatcherLinkPane.module.less';
 
 type WatcherLinkPaneProps = {
   className?: string
