@@ -1,6 +1,7 @@
 // Forge Configuration
 const path = require('path');
 const rootDir = process.cwd();
+const {exec} = require('child_process');
 
 module.exports = {
   // Packager Config
@@ -11,6 +12,23 @@ module.exports = {
     executableName: 'deskcast',
     // Set application copyright
     appCopyright: 'Copyright (C) 2022 Maksim Lavrenyuk',
+  },
+  hooks: {
+    generateAssets: async () => {
+      await new Promise((resolve, reject) => {
+        const buildProcess = exec('yarn watcher-client-build');
+
+        buildProcess.on('close', () => {
+          console.log('The watcher\'s client has been compiled!');
+          resolve();
+        });
+
+        buildProcess.on('error', () => {
+          console.error('Error when building the watcher client!');
+          reject();
+        });
+      });
+    },
   },
   // Forge Makers
   makers: [
