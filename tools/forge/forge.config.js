@@ -1,7 +1,9 @@
 // Forge Configuration
 const path = require('path');
+const fsExtra = require('fs-extra');
+const { exec } = require('child_process');
+
 const rootDir = process.cwd();
-const {exec} = require('child_process');
 
 module.exports = {
   // Packager Config
@@ -16,10 +18,11 @@ module.exports = {
   hooks: {
     generateAssets: async () => {
       await new Promise((resolve, reject) => {
+        const inProd = process.env.NODE_ENV === 'production';
         const buildProcess = exec('yarn watcher-client-build');
 
-        buildProcess.on('close', () => {
-          console.log('The watcher\'s client has been compiled!');
+        buildProcess.on('exit', () => {
+          console.log('\nThe watcher\'s client has been compiled!');
           resolve();
         });
 

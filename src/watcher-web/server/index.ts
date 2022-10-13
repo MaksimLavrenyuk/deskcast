@@ -24,10 +24,12 @@ class WatcherServer {
     });
 
     watcherApp.use(express.static('node_modules'));
-    watcherApp.use(express.static(path.resolve('src/watcher-web/client/dist/')));
+    // watcherApp.use(express.static(path.resolve('src/watcher-web/client/dist/')));
+    watcherApp.use(express.static(path.join(__dirname, 'watcher-web/client/dist')));
 
     watcherApp.get('/', (req, res) => {
-      res.sendFile(path.resolve('src/watcher-web/client/dist/index.html'));
+      // res.sendFile(path.resolve('src/watcher-web/client/dist/index.html'));
+      res.sendFile(path.join(__dirname, 'watcher-web/client/dist/index.html'));
     });
 
     watcherApp.get('/connection_sender_uri', (req, res) => {
