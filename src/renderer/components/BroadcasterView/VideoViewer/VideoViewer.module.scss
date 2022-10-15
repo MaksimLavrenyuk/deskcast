@@ -1,0 +1,11 @@
+.videoContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  height: 100%;
+  video {
+    max-width: 100%;
+  }
+}

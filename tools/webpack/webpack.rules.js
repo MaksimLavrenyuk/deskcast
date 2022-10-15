@@ -1,8 +1,13 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { inDev } = require('./webpack.helpers');
 
 const isDevelopment = inDev();
 
 module.exports = [
+  {
+    test: /\.html$/i,
+    loader: 'html-loader',
+  },
   {
     // Add support for native node modules
     test: /\.node$/,
@@ -50,6 +55,29 @@ module.exports = [
         loader: 'sass-loader',
         options: {
           sourceMap: isDevelopment,
+        },
+      },
+    ],
+  },
+  // LESS Loader
+  {
+    test: /\.module\.less$/,
+    use: [
+      { loader: 'style-loader' },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: true,
+          sourceMap: isDevelopment,
+        },
+      },
+      {
+        loader: 'less-loader',
+        options: {
+          sourceMap: isDevelopment,
+          lessOptions: {
+            javascriptEnabled: true,
+          },
         },
       },
     ],

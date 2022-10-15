@@ -1,20 +1,45 @@
-import { app, BrowserWindow } from 'electron';
+import {
+  app, BrowserWindow, desktopCapturer, ipcMain,
+} from 'electron';
 import path from 'path';
+import IpcMainManager from '../utils/IpcManager/IpcMainManager';
+import WatcherServer from '../watcher-web/server';
+import { inDev } from '../common/helpers';
 
 // Electron Forge automatically creates these entry points
 declare const APP_WINDOW_WEBPACK_ENTRY: string;
 declare const APP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-let appWindow: BrowserWindow;
+const watcherServer = new WatcherServer();
 
 /**
  * Register Inter Process Communication
  */
-function registerMainIPC() {
+function registerMainIPC(appWindow: BrowserWindow) {
+  const ipcMainManager = new IpcMainManager(ipcMain, appWindow);
+
   /**
    * Here you can assign IPC related codes for the application window
    * to Communicate asynchronously from the main process to renderer processes.
    */
+
+  ipcMainManager.on('GET_DESKTOP_CAPTURE_SOURCES', async () => {
+    const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
+    const sourcesData = [];
+
+    for (const source of sources) {
+      sourcesData.push({
+        name: source.name,
+        id: source.id,
+      });
+    }
+
+    ipcMainManager.send('DESKTOP_CAPTURE_SOURCES', { sources: sourcesData });
+  });
+
+  ipcMainManager.on('GET_WATCHER_LINK', () => {
+    ipcMainManager.send('WATCHER_LINK', { link: watcherServer.getWatcherServerLink() });
+  });
 }
 
 /**
@@ -23,9 +48,9 @@ function registerMainIPC() {
  */
 export default function createAppWindow(): BrowserWindow {
   // Create new window instance
-  appWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+  let appWindow = new BrowserWindow({
+    width: 1200,
+    height: 1200,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
@@ -41,13 +66,14 @@ export default function createAppWindow(): BrowserWindow {
 
   // Load the index.html of the app window.
   appWindow.loadURL(APP_WINDOW_WEBPACK_ENTRY);
-  appWindow.webContents.openDevTools();
+
+  if (inDev()) appWindow.webContents.openDevTools();
 
   // Show window when its ready to
   appWindow.on('ready-to-show', () => appWindow.show());
 
   // Register Inter Process Communication for main process
-  registerMainIPC();
+  registerMainIPC(appWindow);
 
   // Close all windows when main window is closed
   appWindow.on('close', () => {

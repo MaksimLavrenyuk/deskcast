@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import BroadcasterView from './components/BroadcasterView';
 
 function Application() {
   const [darkTheme, setDarkTheme] = useState(true);
@@ -28,7 +29,7 @@ function Application() {
   }, [darkTheme]);
 
   return (
-    <div>app</div>
+    <BroadcasterView />
   );
 }
 
