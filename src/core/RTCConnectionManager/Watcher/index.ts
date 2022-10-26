@@ -51,6 +51,7 @@ class Watcher {
       await this.peerConnection.setLocalDescription(sdp);
       this.connectionReceiver.answer(this.peerConnection.localDescription);
     } catch (e) {
+      // window.alert(e);
       console.log(e);
     }
   };

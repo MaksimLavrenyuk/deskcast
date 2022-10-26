@@ -14,6 +14,9 @@ const LOCALS = {
   CLOSE_BROADCAST: 'Broadcast is over',
 };
 
+// window.addEventListener('error', (...args) => window.alert(JSON.stringify(args)));
+// window.addEventListener('unhandledrejection', (...args) => window.alert(JSON.stringify(args)));
+
 class StreamWatcher extends Component<unknown, State> {
   private static async requestConnectionUri(): Promise<string | null> {
     try {
@@ -25,6 +28,7 @@ class StreamWatcher extends Component<unknown, State> {
 
       return null;
     } catch (e) {
+      // window.alert(e);
       return null;
     }
   }
@@ -66,6 +70,7 @@ class StreamWatcher extends Component<unknown, State> {
         this.isFullScreen = !this.isFullScreen;
       } catch (e) {
         this.isFullScreen = false;
+        // window.alert(e);
         console.log(e);
       }
     }
