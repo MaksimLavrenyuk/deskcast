@@ -1,6 +1,5 @@
 // Forge Configuration
 const path = require('path');
-const fsExtra = require('fs-extra');
 const { exec } = require('child_process');
 
 const rootDir = process.cwd();
