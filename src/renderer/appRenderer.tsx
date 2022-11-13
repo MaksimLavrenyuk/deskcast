@@ -6,7 +6,7 @@ import 'antd/dist/antd.dark.css';
 
 // Application to Render
 const app = (
-    <Application />
+  <Application />
 );
 
 // Render application in DOM
