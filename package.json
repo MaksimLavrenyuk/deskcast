@@ -1,6 +1,6 @@
 {
-  "name": "deskcast",
-  "productName": "deskcast",
+  "name": "Deskcast",
+  "productName": "Deskcast",
   "private": true,
   "version": "0.0.0",
   "description": "Application for desktop broadcasting within a local network",
@@ -48,6 +48,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.1",
     "electron": "^19.0.9",
+    "electron-icon-maker": "^0.0.5",
     "eslint": "^8.20.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-import-resolver-alias": "^1.1.2",

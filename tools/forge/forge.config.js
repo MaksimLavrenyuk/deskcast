@@ -11,9 +11,10 @@ module.exports = {
     // Create asar archive for main, renderer process files
     asar: true,
     // Set executable name
-    executableName: 'deskcast',
+    executableName: 'Deskcast',
     // Set application copyright
     appCopyright: 'Copyright (C) 2022 Maksim Lavrenyuk',
+    icon: 'src/assets/icon',
   },
   hooks: {
     generateAssets: async () => {
@@ -40,7 +41,8 @@ module.exports = {
       // Windows applications and is therefore the most user friendly you can get.
       name: '@electron-forge/maker-squirrel',
       config: {
-        name: 'deskcast',
+        name: 'Deskcast',
+        setupIcon: 'src/assets/icon.png',
       },
     },
     {
@@ -48,18 +50,31 @@ module.exports = {
       // There are no platform specific dependencies for using this maker and it will run on any platform.
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
+      config: {
+        options: {
+          icon: 'src/assets/icon.png',
+        },
+      },
     },
     {
       // The deb target builds .deb packages, which are the standard package format for Debian-based
       // Linux distributions such as Ubuntu.
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          icon: 'src/assets/icon.png',
+        },
+      },
     },
     {
       // The RPM target builds .rpm files, which is the standard package format for
       // RedHat-based Linux distributions such as Fedora.
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        options: {
+          icon: 'src/assets/icon.png',
+        },
+      },
     },
   ],
   // Forge Plugins
