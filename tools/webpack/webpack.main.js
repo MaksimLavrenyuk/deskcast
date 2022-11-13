@@ -1,0 +1,25 @@
+const CopyPlugin = require('copy-webpack-plugin');
+
+module.exports = {
+  /**
+   * This is the main entry point for your application, it's the first file
+   * that runs in the main process.
+   */
+  entry: ['./src/main/app.ts'],
+  // Put your normal webpack config below here
+  module: {
+    rules: require('./webpack.rules'),
+  },
+  resolve: {
+    fallback: { path: require.resolve('path-browserify') },
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
+  },
+  stats: 'minimal',
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: './src/watcher-web/client/dist/', to: 'watcher-web/client/dist' },
+      ],
+    }),
+  ],
+};
