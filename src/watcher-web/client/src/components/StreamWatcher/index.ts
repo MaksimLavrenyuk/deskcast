@@ -25,6 +25,7 @@ class StreamWatcher extends Component<unknown, State> {
 
       return null;
     } catch (e) {
+      console.log(e);
       return null;
     }
   }

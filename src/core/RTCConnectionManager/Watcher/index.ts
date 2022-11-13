@@ -1,4 +1,5 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
+import 'webrtc-adapter';
 import { Receiver } from '../Receiver';
 
 type WatcherDeps = {

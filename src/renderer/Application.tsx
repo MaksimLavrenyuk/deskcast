@@ -1,5 +1,9 @@
+import adapter from 'webrtc-adapter';
 import React, { useEffect, useState } from 'react';
 import BroadcasterView from './components/BroadcasterView';
+
+
+console.log(JSON.stringify(adapter.browserDetails));
 
 function Application() {
   const [darkTheme, setDarkTheme] = useState(true);

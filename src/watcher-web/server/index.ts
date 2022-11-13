@@ -43,7 +43,7 @@ class WatcherServer {
     watcherServer.listen(
       WatcherServer.WATCHER_PORT,
       this.addressInLocalNetwork,
-      () => console.log(`watcher server is running on port ${WatcherServer.WATCHER_PORT}`),
+      () => console.log(`\nWatcher server is running on port ${WatcherServer.WATCHER_PORT}`),
     );
   }
 
