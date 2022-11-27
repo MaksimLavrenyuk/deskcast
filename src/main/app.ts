@@ -1,5 +1,8 @@
 import { app, BrowserWindow } from 'electron';
+import updateElectronApp from 'update-electron-app';
 import createAppWindow from './appWindow';
+
+updateElectronApp();
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 // eslint-disable-next-line global-require

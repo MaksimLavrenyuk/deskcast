@@ -15,6 +15,19 @@ module.exports = {
     appCopyright: 'Copyright (C) 2022 Maksim Lavrenyuk',
     icon: 'src/assets/icon',
   },
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'MaksimLavrenyuk',
+          name: 'deskcast',
+        },
+        draft: true,
+        prerelease: false,
+      },
+    },
+  ],
   hooks: {
     generateAssets: async () => {
       await new Promise((resolve, reject) => {

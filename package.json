@@ -11,7 +11,8 @@
     "package": "electron-forge package",
     "make": "NODE_ENV=production electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint src/ --ext .ts,.js,.tsx,.jsx"
+    "lint": "eslint src/ --ext .ts,.js,.tsx,.jsx",
+    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "author": {
     "name": "Maksim Lavrenyuk",
@@ -94,6 +95,7 @@
     "stream-browserify": "^3.0.0",
     "strict-event-emitter": "^0.2.4",
     "type-fest": "^2.19.0",
+    "update-electron-app": "^2.0.1",
     "webpack-cli": "^4.10.0",
     "webrtc-adapter": "^8.2.0"
   }
