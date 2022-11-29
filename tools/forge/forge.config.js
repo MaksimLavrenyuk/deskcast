@@ -88,14 +88,6 @@ module.exports = {
       },
     },
     {
-      name: '@electron-forge/maker-flatpak',
-      config: {
-        options: {
-          categories: ['Video', 'Education', 'Office'],
-        },
-      },
-    },
-    {
       // The deb target builds .deb packages, which are the standard package format for Debian-based
       // Linux distributions such as Ubuntu.
       name: '@electron-forge/maker-deb',
