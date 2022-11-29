@@ -59,7 +59,7 @@ module.exports = {
         iconUrl:
           'https://raw.githubusercontent.com/MaksimLavrenyuk/deskcast/master/src/assets/icon.ico',
         noMsi: true,
-        setupExe: `Desckast-setup.exe`,
+        setupExe: 'Desckast-setup.exe',
         setupIcon: 'src/assets/icon.ico',
         // certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
         // certificatePassword: process.env['WINDOWS_CODESIGN_PASSWORD'],
@@ -73,8 +73,8 @@ module.exports = {
         icon: 'src/assets/icon.ico',
         ui: {
           chooseDirectory: true,
-        }
-      }
+        },
+      },
     },
     {
       // The Zip target builds basic .zip files containing your packaged application.
@@ -84,6 +84,14 @@ module.exports = {
       config: {
         options: {
           icon: 'src/assets/icon.png',
+        },
+      },
+    },
+    {
+      name: '@electron-forge/maker-flatpak',
+      config: {
+        options: {
+          categories: ['Video', 'Education', 'Office'],
         },
       },
     },

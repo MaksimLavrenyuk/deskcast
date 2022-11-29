@@ -1,8 +1,12 @@
 import { app, BrowserWindow } from 'electron';
 import updateElectronApp from 'update-electron-app';
+import logger from 'electron-log';
 import createAppWindow from './appWindow';
 
-updateElectronApp();
+updateElectronApp({
+  repo: 'MaksimLavrenyuk/deskcast',
+  logger,
+});
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 // eslint-disable-next-line global-require
