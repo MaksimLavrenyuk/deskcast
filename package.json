@@ -11,7 +11,8 @@
     "package": "electron-forge package",
     "make": "NODE_ENV=production electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint src/ --ext .ts,.js,.tsx,.jsx"
+    "lint": "eslint src/ --ext .ts,.js,.tsx,.jsx",
+    "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "author": {
     "name": "Maksim Lavrenyuk",
@@ -30,6 +31,7 @@
     "@electron-forge/maker-deb": "6.0.0-beta.64",
     "@electron-forge/maker-rpm": "6.0.0-beta.64",
     "@electron-forge/maker-squirrel": "6.0.0-beta.64",
+    "@electron-forge/maker-wix": "^6.0.3",
     "@electron-forge/maker-zip": "6.0.0-beta.64",
     "@electron-forge/plugin-webpack": "6.0.0-beta.64",
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
@@ -80,6 +82,7 @@
     "antd": "^4.23.2",
     "axios": "^0.27.2",
     "browserify-fs": "^1.0.0",
+    "electron-log": "^4.4.8",
     "electron-squirrel-startup": "^1.0.0",
     "express": "^4.18.1",
     "ip": "^1.1.8",
@@ -94,6 +97,7 @@
     "stream-browserify": "^3.0.0",
     "strict-event-emitter": "^0.2.4",
     "type-fest": "^2.19.0",
+    "update-electron-app": "^2.0.1",
     "webpack-cli": "^4.10.0",
     "webrtc-adapter": "^8.2.0"
   }

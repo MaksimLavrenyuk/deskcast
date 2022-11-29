@@ -15,6 +15,19 @@ module.exports = {
     appCopyright: 'Copyright (C) 2022 Maksim Lavrenyuk',
     icon: 'src/assets/icon',
   },
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'MaksimLavrenyuk',
+          name: 'deskcast',
+        },
+        draft: true,
+        prerelease: false,
+      },
+    },
+  ],
   hooks: {
     generateAssets: async () => {
       await new Promise((resolve, reject) => {
@@ -39,9 +52,28 @@ module.exports = {
       // Squirrel.Windows is a no-prompt, no-hassle, no-admin method of installing
       // Windows applications and is therefore the most user friendly you can get.
       name: '@electron-forge/maker-squirrel',
-      config: {
+      config: (arch) => ({
         name: 'Deskcast',
-        setupIcon: 'src/assets/icon.png',
+        authors: 'Maksim Lavrenyuk',
+        exe: 'Deskcast.exe',
+        iconUrl:
+          'https://raw.githubusercontent.com/MaksimLavrenyuk/deskcast/master/src/assets/icon.ico',
+        noMsi: true,
+        setupExe: 'Desckast-setup.exe',
+        setupIcon: 'src/assets/icon.ico',
+        // certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
+        // certificatePassword: process.env['WINDOWS_CODESIGN_PASSWORD'],
+      }),
+    },
+    {
+      name: '@electron-forge/maker-wix',
+      config: {
+        language: 1033,
+        manufacturer: 'Maksim Lavrenyuk',
+        icon: 'src/assets/icon.ico',
+        ui: {
+          chooseDirectory: true,
+        },
       },
     },
     {

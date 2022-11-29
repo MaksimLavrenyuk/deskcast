@@ -1,0 +1,35 @@
+name: Build
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build_on_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@master
+        with:
+          node-version: 14
+      - name: install dependencies
+        run: yarn install
+      - name: build
+        run: yarn make
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: true
+          files: |
+            out/**/*.deb
+            out/**/*.dmg
+            out/**/*setup*.exe
+            out/**/*.nupkg
+            out/**/*.rpm
+            out/**/*.zip
+            out/**/RELEASES
