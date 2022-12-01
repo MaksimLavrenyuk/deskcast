@@ -3,17 +3,20 @@ const path = require('path');
 const { exec } = require('child_process');
 
 const rootDir = process.cwd();
+const iconDir = path.resolve(rootDir, 'src', 'assets', 'icons');
+
+const commonLinuxConfig = {
+  icon: {
+    scalable: path.resolve(iconDir, 'icon.svg'),
+  },
+};
 
 module.exports = {
   // Packager Config
   packagerConfig: {
     // Create asar archive for main, renderer process files
     asar: true,
-    // Set executable name
-    executableName: 'Deskcast',
-    // Set application copyright
-    appCopyright: 'Copyright (C) 2022 Maksim Lavrenyuk',
-    icon: 'src/assets/icon',
+    icon: 'src/assets/icons/icon',
   },
   publishers: [
     {
@@ -60,7 +63,7 @@ module.exports = {
           'https://raw.githubusercontent.com/MaksimLavrenyuk/deskcast/master/src/assets/icon.ico',
         noMsi: true,
         setupExe: 'Desckast-setup.exe',
-        setupIcon: 'src/assets/icon.ico',
+        setupIcon: 'src/assets/icons/icon.ico',
         // certificateFile: process.env['WINDOWS_CODESIGN_FILE'],
         // certificatePassword: process.env['WINDOWS_CODESIGN_PASSWORD'],
       }),
@@ -70,7 +73,7 @@ module.exports = {
       config: {
         language: 1033,
         manufacturer: 'Maksim Lavrenyuk',
-        icon: 'src/assets/icon.ico',
+        icon: 'src/assets/icons/icon.ico',
         ui: {
           chooseDirectory: true,
         },
@@ -83,7 +86,7 @@ module.exports = {
       platforms: ['darwin'],
       config: {
         options: {
-          icon: 'src/assets/icon.png',
+          icon: 'src/assets/icons/icon.png',
         },
       },
     },
@@ -91,31 +94,25 @@ module.exports = {
       // The deb target builds .deb packages, which are the standard package format for Debian-based
       // Linux distributions such as Ubuntu.
       name: '@electron-forge/maker-deb',
-      config: {
-        options: {
-          icon: 'src/assets/icon.png',
-        },
-      },
+      platforms: ['linux'],
+      config: commonLinuxConfig,
     },
     {
       // The RPM target builds .rpm files, which is the standard package format for
       // RedHat-based Linux distributions such as Fedora.
       name: '@electron-forge/maker-rpm',
-      config: {
-        options: {
-          icon: 'src/assets/icon.png',
-        },
-      },
+      platforms: ['linux'],
+      config: commonLinuxConfig,
     },
   ],
   // Forge Plugins
   plugins: [
-    [
-      // The Webpack plugin allows you to use standard Webpack tooling to compile both your main process code
-      // and your renderer process code, with built in support for Hot Module Reloading in the renderer
-      // process and support for multiple renderers.
-      '@electron-forge/plugin-webpack',
-      {
+    // The Webpack plugin allows you to use standard Webpack tooling to compile both your main process code
+    // and your renderer process code, with built in support for Hot Module Reloading in the renderer
+    // process and support for multiple renderers.
+    {
+      name: '@electron-forge/plugin-webpack',
+      config: {
         // fix content-security-policy error when image or video src isn't same origin
         devContentSecurityPolicy: '',
         // Ports
@@ -150,6 +147,6 @@ module.exports = {
           liveReload: false,
         },
       },
-    ],
+    },
   ],
 };
