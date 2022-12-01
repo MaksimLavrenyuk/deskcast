@@ -16,10 +16,6 @@ module.exports = {
   packagerConfig: {
     // Create asar archive for main, renderer process files
     asar: true,
-    // Set executable name
-    executableName: 'Deskcast',
-    // Set application copyright
-    appCopyright: 'Copyright (C) 2022 Maksim Lavrenyuk',
     icon: 'src/assets/icons/icon',
   },
   publishers: [
@@ -111,12 +107,12 @@ module.exports = {
   ],
   // Forge Plugins
   plugins: [
-    [
-      // The Webpack plugin allows you to use standard Webpack tooling to compile both your main process code
-      // and your renderer process code, with built in support for Hot Module Reloading in the renderer
-      // process and support for multiple renderers.
-      '@electron-forge/plugin-webpack',
-      {
+    // The Webpack plugin allows you to use standard Webpack tooling to compile both your main process code
+    // and your renderer process code, with built in support for Hot Module Reloading in the renderer
+    // process and support for multiple renderers.
+    {
+      name: '@electron-forge/plugin-webpack',
+      config: {
         // fix content-security-policy error when image or video src isn't same origin
         devContentSecurityPolicy: '',
         // Ports
@@ -151,6 +147,6 @@ module.exports = {
           liveReload: false,
         },
       },
-    ],
+    },
   ],
 };
