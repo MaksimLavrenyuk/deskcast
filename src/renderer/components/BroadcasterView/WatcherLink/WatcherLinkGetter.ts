@@ -1,25 +1,17 @@
-import { IpcRendererManager } from '../../../../utils';
 import { WatcherLinkGetterI } from '../../../../core/WatcherLinkGetter/types';
+import { IpcManagerI } from '../../../../utils/IpcManager';
 
 class WatcherLinkGetter implements WatcherLinkGetterI {
-  private readonly linkWaiter: Promise<string>;
+  ipc: IpcManagerI;
 
-  ipc: IpcRendererManager;
-
-  constructor(ipcRenderer: IpcRendererManager) {
+  constructor(ipcRenderer: IpcManagerI) {
     this.ipc = ipcRenderer;
-
-    this.linkWaiter = new Promise((resolve) => {
-      this.ipc.on('WATCHER_LINK', (payload) => {
-        resolve(payload.link);
-      });
-    });
   }
 
-  link = () => {
-    this.ipc.send('GET_WATCHER_LINK');
+  link = async () => {
+    const response = await this.ipc.invoke('watcherUrl');
 
-    return this.linkWaiter;
+    return response.url;
   };
 }
 

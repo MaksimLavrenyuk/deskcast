@@ -2,7 +2,7 @@ import {
   app, BrowserWindow, desktopCapturer, ipcMain,
 } from 'electron';
 import path from 'path';
-import IpcMainManager from '../utils/IpcManager/IpcMainManager';
+import IpcManager from '../utils/IpcManager';
 import WatcherServer from '../watcher-web/server';
 import { inDev } from '../common/helpers';
 
@@ -16,14 +16,9 @@ const watcherServer = new WatcherServer();
  * Register Inter Process Communication
  */
 function registerMainIPC(appWindow: BrowserWindow) {
-  const ipcMainManager = new IpcMainManager(ipcMain, appWindow);
+  const impManager = new IpcManager({ ipcMain });
 
-  /**
-   * Here you can assign IPC related codes for the application window
-   * to Communicate asynchronously from the main process to renderer processes.
-   */
-
-  ipcMainManager.on('GET_DESKTOP_CAPTURE_SOURCES', async () => {
+  impManager.handle('screenSources', async () => {
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
     const sourcesData = [];
 
@@ -34,12 +29,10 @@ function registerMainIPC(appWindow: BrowserWindow) {
       });
     }
 
-    ipcMainManager.send('DESKTOP_CAPTURE_SOURCES', { sources: sourcesData });
+    return { sources: sourcesData };
   });
 
-  ipcMainManager.on('GET_WATCHER_LINK', () => {
-    ipcMainManager.send('WATCHER_LINK', { link: watcherServer.getWatcherServerLink() });
-  });
+  impManager.handle('watcherUrl', () => ({ url: watcherServer.getWatcherServerLink() }));
 }
 
 /**

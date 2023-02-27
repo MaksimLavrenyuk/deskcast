@@ -1,24 +1,16 @@
-import { SourceCollector, Source } from '../../../../core/SourceCollector/types';
-import { IpcRendererManager } from '../../../../utils';
+import { SourceCollector } from '../../../../core/SourceCollector/types';
+import { IpcManagerI } from '../../../../utils/IpcManager';
 
 export default class RendererCapturer implements SourceCollector {
-  private readonly sourcesWaiter: Promise<Source[]>;
+  ipc: IpcManagerI;
 
-  ipc: IpcRendererManager;
-
-  constructor(ipcRenderer: IpcRendererManager) {
+  constructor(ipcRenderer: IpcManagerI) {
     this.ipc = ipcRenderer;
-
-    this.sourcesWaiter = new Promise((resolve) => {
-      this.ipc.on('DESKTOP_CAPTURE_SOURCES', (payload) => {
-        resolve([...payload.sources]);
-      });
-    });
   }
 
-  sources = () => {
-    this.ipc.send('GET_DESKTOP_CAPTURE_SOURCES');
+  sources = async () => {
+    const response = await this.ipc.invoke('screenSources');
 
-    return this.sourcesWaiter;
+    return response.sources;
   };
 }

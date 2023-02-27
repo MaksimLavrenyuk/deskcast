@@ -4,11 +4,11 @@ import React, {
 import { Skeleton } from 'antd';
 import classes from './WatcherLink.module.less';
 import WatcherLinkGetter from './WatcherLinkGetter';
-import IpcRendererManager from '../../../../utils/IpcManager/IpcRendererManager';
+import IpcManager from '../../../../utils/IpcManager';
 import CopyBtn from '../../CopyBtn';
 
 function WatcherLink() {
-  const linkGetter = useMemo(() => new WatcherLinkGetter(IpcRendererManager.get()), []);
+  const linkGetter = useMemo(() => new WatcherLinkGetter(IpcManager.getInRenderer()), []);
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState<string | null>(null);
 
