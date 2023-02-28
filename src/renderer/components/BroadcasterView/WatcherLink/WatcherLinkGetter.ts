@@ -1,5 +1,5 @@
 import { WatcherLinkGetterI } from '../../../../core/WatcherLinkGetter/types';
-import { IpcManagerI } from '../../../../core/IpcManager';
+import { IpcManagerI } from '../../../../core/IpcManager/types';
 
 class WatcherLinkGetter implements WatcherLinkGetterI {
   ipc: IpcManagerI;
