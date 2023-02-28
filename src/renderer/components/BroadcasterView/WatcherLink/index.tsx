@@ -4,7 +4,7 @@ import React, {
 import { Skeleton } from 'antd';
 import classes from './WatcherLink.module.less';
 import WatcherLinkGetter from './WatcherLinkGetter';
-import IpcManager from '../../../../utils/IpcManager';
+import IpcManager from '../../../../core/IpcManager';
 import CopyBtn from '../../CopyBtn';
 
 function WatcherLink() {

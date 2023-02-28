@@ -1,19 +1,5 @@
 import { ContextBridge } from 'electron';
-
-type IpcChannels = {
-  screenSources: { sources: { id: string, name: string }[] }
-  watcherUrl: { url: string }
-}
-
-export interface IpcManagerI {
-  invoke<Channel extends keyof IpcChannels>(channel: Channel): Promise<IpcChannels[Channel]>
-  handle<Channel extends keyof IpcChannels>(channel: Channel, handler: () => IpcChannels[Channel]): void
-}
-
-type IpcManagerProps = {
-  ipcRenderer?: Electron.IpcRenderer,
-  ipcMain?: Electron.IpcMain,
-}
+import { IpcManagerI, IpcChannels } from './types';
 
 const managerInRenderer = 'ipcManager';
 
@@ -21,6 +7,11 @@ declare global {
   interface Window {
     [managerInRenderer]: IpcManagerI
   }
+}
+
+type IpcManagerProps = {
+  ipcRenderer?: Electron.IpcRenderer,
+  ipcMain?: Electron.IpcMain,
 }
 
 export default class IpcManager implements IpcManagerI {

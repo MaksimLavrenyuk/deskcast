@@ -1,7 +1,7 @@
-import { SourceCollector } from '../../../../core/SourceCollector/types';
-import { IpcManagerI } from '../../../../utils/IpcManager';
+import { SourceCollector } from '../types';
+import { IpcManagerI } from '../../IpcManager/types';
 
-export default class RendererCapturer implements SourceCollector {
+export default class RendererSourceCollector implements SourceCollector {
   ipc: IpcManagerI;
 
   constructor(ipcRenderer: IpcManagerI) {

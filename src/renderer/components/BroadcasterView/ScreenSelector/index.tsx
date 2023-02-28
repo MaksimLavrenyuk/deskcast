@@ -4,8 +4,8 @@ import React, {
 } from 'react';
 import Screens from './Screens';
 import StreamManager from '../StreamManager';
-import RendererCapturer from '../RendererCapturer';
-import IpcManager from '../../../../utils/IpcManager';
+import IpcManager from '../../../../core/IpcManager';
+import RendererSourceCollector from '../../../../core/SourceCollector/RendererSourceCollector';
 
 type ScreenSelectorProps = {
   onSelect(stream: MediaStream): void
@@ -17,7 +17,7 @@ function ScreenSelector(props: ScreenSelectorProps) {
   const { onSelect, open, onCancel } = props;
   const [stream, setStream] = useState<MediaStream | null>(null);
   const streamManager = useMemo(() => new StreamManager(), []);
-  const sourceCollector = useMemo(() => new RendererCapturer(IpcManager.getInRenderer()), []);
+  const sourceCollector = useMemo(() => new RendererSourceCollector(IpcManager.getInRenderer()), []);
 
   const okHandler = useCallback(() => {
 

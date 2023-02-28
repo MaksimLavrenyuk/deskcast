@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import IpcManager from '../utils/IpcManager';
+import IpcManager from '../core/IpcManager';
 
 IpcManager.installInRenderer(contextBridge, { ipcRenderer });
 

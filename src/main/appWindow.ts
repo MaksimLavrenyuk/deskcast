@@ -2,7 +2,7 @@ import {
   app, BrowserWindow, desktopCapturer, ipcMain,
 } from 'electron';
 import path from 'path';
-import IpcManager from '../utils/IpcManager';
+import IpcManager from '../core/IpcManager';
 import WatcherServer from '../watcher-web/server';
 import { inDev } from '../common/helpers';
 
