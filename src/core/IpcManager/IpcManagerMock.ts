@@ -1,11 +1,11 @@
 import { IpcManagerI } from './types';
 
-type Hanlders = {
+type Handlers = {
   [key: string]: () => any
 }
 
 export default class IpcManagerMock implements IpcManagerI {
-  handlers: Hanlders = {};
+  handlers: Handlers = {};
 
   invoke: IpcManagerI['invoke'] = async (channel) => (this.handlers[channel]
     ? this.handlers[channel]()

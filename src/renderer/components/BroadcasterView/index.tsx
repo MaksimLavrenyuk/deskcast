@@ -1,29 +1,39 @@
 import React, {
-  useCallback, useMemo, memo, useState,
+  useCallback, useMemo, useState,
 } from 'react';
-import { SelectHandler } from './ScreenSelector/Screens';
+import { observer } from 'mobx-react';
 import VideoViewer from './VideoViewer';
-import Broadcaster from '../../../core/RTCConnectionManager/Broadcaster';
-import SocketSender from '../../../core/RTCConnectionManager/Sender/SocketSender';
 import StartScreen from './StartScreen';
-import VideoControlPane from './VideoControlPane';
-import ScreenSelector from './ScreenSelector';
+import ControlPane from './ControlPane';
+import ScreensModal from './Screens/ScreenModal';
+import WatcherLink from './WatcherLink';
+import Screens from './Screens';
 import classes from './BroadcasterView.module.scss';
+import BroadcasterView, { SelectScreen } from './BroadcasterView';
+import RendererSourceCollector from '../../../core/SourceCollector/RendererSourceCollector';
+import IpcManager from '../../../core/IpcManager';
+import RendererGetterWatcherURL from '../../../core/GetterWatcherURL/RendererGetterWatcherURL';
 
-function BroadcasterView() {
-  const [video, setVideo] = useState<MediaStream | null>(null);
+function Broadcaster() {
+  const broadcasterView = useMemo(() => {
+    const ipcManager = IpcManager.getInRenderer();
+
+    return new BroadcasterView({
+      sourceCollector: new RendererSourceCollector(ipcManager),
+      getterWatcherURL: new RendererGetterWatcherURL(ipcManager),
+    });
+  }, []);
+  const activeScreen = broadcasterView.activeScreen();
   const [openSelector, setOpenSelector] = useState(false);
-  const broadcaster = useMemo(() => new Broadcaster({ sender: new SocketSender('ws://localhost:4002') }), []);
 
-  const selectHandler: SelectHandler = useCallback((stream) => {
-    setVideo(stream);
+  const selectScreenHandler: SelectScreen = useCallback((screenID) => {
     setOpenSelector(false);
-    broadcaster.attachStream(stream);
-  }, [broadcaster]);
+    broadcasterView.selectScreen(screenID);
+  }, [broadcasterView]);
+
   const cancelStreamHandler = useCallback(() => {
-    setVideo(null);
-    broadcaster.cancelStream();
-  }, [broadcaster]);
+    broadcasterView.reset();
+  }, [broadcasterView]);
 
   const selectScreenRequestHandler = useCallback(() => {
     setOpenSelector(true);
@@ -34,26 +44,35 @@ function BroadcasterView() {
 
   return (
     <div className={classes.broadcaster}>
-      {!video && (
-        <StartScreen onStart={selectScreenRequestHandler} />
+      {!activeScreen && (
+        <StartScreen
+          onStart={selectScreenRequestHandler}
+          watcherLink={
+            <WatcherLink getWatcherURL={broadcasterView.watcher} />
+          }
+        />
       )}
-      {video && (
+      {activeScreen && (
         <>
-          <VideoViewer video={video} />
-          <VideoControlPane
+          <VideoViewer video={activeScreen.stream} />
+          <ControlPane
             className={classes.controlPane}
             requestChangeScreen={selectScreenRequestHandler}
             onCancelStream={cancelStreamHandler}
+            watcherLink={
+              <WatcherLink getWatcherURL={broadcasterView.watcher} />
+            }
           />
         </>
       )}
-      <ScreenSelector
-        open={openSelector}
-        onCancel={cancelSelectScreenHandler}
-        onSelect={selectHandler}
-      />
+      <ScreensModal open={openSelector} onCancel={cancelSelectScreenHandler}>
+        <Screens
+          onSelect={selectScreenHandler}
+          getScreens={broadcasterView.getScreens}
+        />
+      </ScreensModal>
     </div>
   );
 }
 
-export default memo(BroadcasterView);
+export default observer(Broadcaster);

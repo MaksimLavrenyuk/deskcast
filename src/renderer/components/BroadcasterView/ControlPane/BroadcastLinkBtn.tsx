@@ -1,14 +1,14 @@
 import { Button, Modal, Tooltip } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 import React, { memo, useCallback, useState } from 'react';
-import WatcherLink from '../WatcherLink';
 
 type BroadcastLinkBtnProps = {
   className?: string
+  watcherLink: React.ReactNode,
 }
 
 function BroadcastLinkBtn(props: BroadcastLinkBtnProps) {
-  const { className = '' } = props;
+  const { className = '', watcherLink } = props;
   const [openLinkModal, toggleLinkModal] = useState(false);
 
   const closeModalHandler = useCallback(() => {
@@ -42,7 +42,7 @@ function BroadcastLinkBtn(props: BroadcastLinkBtnProps) {
           </Button>,
         ]}
       >
-        <WatcherLink />
+        {watcherLink}
       </Modal>
     </>
   );

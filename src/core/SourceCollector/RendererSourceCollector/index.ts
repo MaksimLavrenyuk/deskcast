@@ -4,8 +4,8 @@ import { IpcManagerI } from '../../IpcManager/types';
 export default class RendererSourceCollector implements SourceCollector {
   ipc: IpcManagerI;
 
-  constructor(ipcRenderer: IpcManagerI) {
-    this.ipc = ipcRenderer;
+  constructor(ipcManager: IpcManagerI) {
+    this.ipc = ipcManager;
   }
 
   sources = async () => {

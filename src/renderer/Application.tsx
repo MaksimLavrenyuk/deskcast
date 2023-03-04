@@ -1,7 +1,7 @@
 import adapter from 'webrtc-adapter';
 import React, { useEffect, useState } from 'react';
 import BroadcasterView from './components/BroadcasterView';
-
+import 'antd/dist/reset.css';
 
 console.log(JSON.stringify(adapter.browserDetails));
 
