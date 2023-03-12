@@ -11,14 +11,6 @@ class SocketSender implements Sender {
   constructor(uri: string) {
     this.socket = io(uri);
     this.eventEmitter = new StrictEventEmitter();
-    this.answerHandler = this.answerHandler.bind(this);
-    this.watcherHandler = this.watcherHandler.bind(this);
-    this.candidateHandler = this.candidateHandler.bind(this);
-    this.disconnectPeerHandler = this.disconnectPeerHandler.bind(this);
-    this.candidate = this.candidate.bind(this);
-    this.offer = this.offer.bind(this);
-    this.on = this.on.bind(this);
-    this.close = this.close.bind(this);
 
     this.socket.on('connect', this.connectHandler);
     this.socket.on('answer', this.answerHandler);
@@ -31,33 +23,33 @@ class SocketSender implements Sender {
     this.eventEmitter.emit('connectToManager');
   };
 
-  private answerHandler(id: string, description: RTCSessionDescription) {
+  private answerHandler = (id: string, description: RTCSessionDescription) => {
     this.eventEmitter.emit('answer', id, description);
-  }
+  };
 
-  private watcherHandler(id: string) {
+  private watcherHandler = (id: string) => {
     this.eventEmitter.emit('watcher', id);
-  }
+  };
 
-  private candidateHandler(id: string, candidate: RTCIceCandidateInit) {
+  private candidateHandler = (id: string, candidate: RTCIceCandidateInit) => {
     this.eventEmitter.emit('candidate', id, candidate);
-  }
+  };
 
-  private disconnectPeerHandler(id: string) {
+  private disconnectPeerHandler = (id: string) => {
     this.eventEmitter.emit('disconnectPeer', id);
-  }
+  };
 
-  public on<Event extends keyof SenderEvents>(event: Event, listener: SenderEvents[Event]) {
+  public on = <Event extends keyof SenderEvents>(event: Event, listener: SenderEvents[Event]) => {
     this.eventEmitter.on(event, listener);
-  }
+  };
 
-  public candidate(id: string, candidate: RTCIceCandidate) {
+  public candidate = (id: string, candidate: RTCIceCandidate) => {
     this.socket.emit('candidate', id, candidate);
-  }
+  };
 
-  public offer(id: string, description: RTCSessionDescription) {
+  public offer = (id: string, description: RTCSessionDescription) => {
     this.socket.emit('offer', id, description);
-  }
+  };
 
   public broadcaster() {
     this.socket.emit('broadcaster');
@@ -67,9 +59,9 @@ class SocketSender implements Sender {
     this.socket.emit('cancel');
   };
 
-  public close() {
+  public close = () => {
     this.socket.close();
-  }
+  };
 }
 
 export default SocketSender;

@@ -1,6 +1,5 @@
-import { Typography } from 'antd';
+import { Card } from 'antd';
 import React, { ReactNode, memo } from 'react';
-import classes from './WatcherLinkPane.module.less';
 
 type WatcherLinkPaneProps = {
   className?: string
@@ -11,10 +10,9 @@ function WatcherLinkPane(props: WatcherLinkPaneProps) {
   const { className = '', children } = props;
 
   return (
-    <div className={`${classes.pane} ${className}`}>
-      <Typography.Title level={5}>Broadcast link</Typography.Title>
+    <Card className={className} title="Broadcast link">
       {children}
-    </div>
+    </Card>
   );
 }
 

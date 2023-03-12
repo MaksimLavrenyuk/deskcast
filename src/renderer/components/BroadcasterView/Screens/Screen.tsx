@@ -2,14 +2,14 @@ import React, {
   memo, useCallback, useEffect, useRef,
 } from 'react';
 import { Card } from 'antd';
-import { Screen } from '../BroadcasterView';
+import { Screen } from '../BroadcacterViewStore';
 
 type ScreenItemProps = {
   onSelect(screenID: string): void
   screen: Screen
 }
 
-function ScreenItem(props: ScreenItemProps) {
+function Screen(props: ScreenItemProps) {
   const {
     onSelect, screen,
   } = props;
@@ -37,4 +37,4 @@ function ScreenItem(props: ScreenItemProps) {
   );
 }
 
-export default memo(ScreenItem);
+export default memo(Screen);

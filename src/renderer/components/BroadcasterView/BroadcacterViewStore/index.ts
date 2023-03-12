@@ -1,8 +1,8 @@
-import { action, observable } from 'mobx';
-import Broadcaster from '../../../core/RTCConnectionManager/Broadcaster';
-import SocketSender from '../../../core/RTCConnectionManager/Sender/SocketSender';
-import { SourceCollector } from '../../../core/SourceCollector/types';
-import { GetterWatcherURLI } from '../../../core/GetterWatcherURL/types';
+import { action, makeObservable, observable } from 'mobx';
+import Broadcaster from '../../../../core/RTCConnectionManager/Broadcaster';
+import SocketSender from '../../../../core/RTCConnectionManager/Sender/SocketSender';
+import { SourceCollector } from '../../../../core/SourceCollector/types';
+import { GetterWatcherURLI } from '../../../../core/GetterWatcherURL/types';
 
 export type SelectScreen = (screenID: string) => void
 
@@ -22,7 +22,7 @@ type BroadcasterViewProps = {
   getterWatcherURL: GetterWatcherURLI
 }
 
-class BroadcasterView {
+class BroadcasterViewStore {
   private broadcaster: Broadcaster;
 
   @observable.ref
@@ -49,6 +49,8 @@ class BroadcasterView {
     this.screens = [];
     this.watcherURL = null;
 
+    makeObservable(this);
+
     this.requestAvailableScreens();
     this.requestWatcherUrl();
   }
@@ -63,7 +65,7 @@ class BroadcasterView {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: streamID,
-            ...BroadcasterView.videoConfig,
+            ...BroadcasterViewStore.videoConfig,
           },
         },
       });
@@ -73,28 +75,6 @@ class BroadcasterView {
       return null;
     }
   }
-
-  selectScreen: SelectScreen = async (screenID) => {
-    let selectedScreen: Screen | null = null;
-
-    this.setScreens(this.screens.map((screen) => {
-      if (screen.id === screenID) {
-        selectedScreen = screen;
-
-        return {
-          ...screen,
-          select: true,
-        };
-      }
-
-      return {
-        ...screen,
-        select: false,
-      };
-    }));
-
-    this.broadcaster.attachStream(selectedScreen.stream);
-  };
 
   @action
   private setScreens(screens: Screen[]) {
@@ -122,6 +102,28 @@ class BroadcasterView {
     this.setWatcherURL(await this.getterWatcherURL.url());
   }
 
+  selectScreen: SelectScreen = async (screenID) => {
+    let selectedScreen: Screen | null = null;
+
+    this.setScreens(this.screens.map((screen) => {
+      if (screen.id === screenID) {
+        selectedScreen = screen;
+
+        return {
+          ...screen,
+          select: true,
+        };
+      }
+
+      return {
+        ...screen,
+        select: false,
+      };
+    }));
+
+    this.broadcaster.attachStream(selectedScreen.stream);
+  };
+
   getScreens: GetScreens = () => this.screens;
 
   activeScreen = () => this.screens.find((screen) => screen.select);
@@ -135,4 +137,4 @@ class BroadcasterView {
   }
 }
 
-export default BroadcasterView;
+export default BroadcasterViewStore;

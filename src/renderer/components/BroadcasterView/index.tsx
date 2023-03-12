@@ -2,23 +2,30 @@ import React, {
   useCallback, useMemo, useState,
 } from 'react';
 import { observer } from 'mobx-react';
-import VideoViewer from './VideoViewer';
-import StartScreen from './StartScreen';
-import ControlPane from './ControlPane';
+import {
+  Space,
+} from 'antd';
+import VideoViewer from './StreamViewer';
+import StartScreen from './Starter';
+import ControlPane from '../ControlPane';
 import ScreensModal from './Screens/ScreenModal';
 import WatcherLink from './WatcherLink';
+import WatcherLinkPane from './WatcherLink/WatcherLinkPane';
 import Screens from './Screens';
 import classes from './BroadcasterView.module.scss';
-import BroadcasterView, { SelectScreen } from './BroadcasterView';
+import BroadcasterViewStore, { SelectScreen } from './BroadcacterViewStore';
 import RendererSourceCollector from '../../../core/SourceCollector/RendererSourceCollector';
 import IpcManager from '../../../core/IpcManager';
 import RendererGetterWatcherURL from '../../../core/GetterWatcherURL/RendererGetterWatcherURL';
+import WatcherLinkBtn from './WatcherLink/WatcherLinkBtn';
+import ChangeScreenControl from './Controls/ChangeScreenControl';
+import CancelControl from './Controls/CancelControl';
 
 function Broadcaster() {
   const broadcasterView = useMemo(() => {
     const ipcManager = IpcManager.getInRenderer();
 
-    return new BroadcasterView({
+    return new BroadcasterViewStore({
       sourceCollector: new RendererSourceCollector(ipcManager),
       getterWatcherURL: new RendererGetterWatcherURL(ipcManager),
     });
@@ -35,7 +42,7 @@ function Broadcaster() {
     broadcasterView.reset();
   }, [broadcasterView]);
 
-  const selectScreenRequestHandler = useCallback(() => {
+  const changeScreenHandler = useCallback(() => {
     setOpenSelector(true);
   }, []);
   const cancelSelectScreenHandler = useCallback(() => {
@@ -46,23 +53,24 @@ function Broadcaster() {
     <div className={classes.broadcaster}>
       {!activeScreen && (
         <StartScreen
-          onStart={selectScreenRequestHandler}
-          watcherLink={
-            <WatcherLink getWatcherURL={broadcasterView.watcher} />
-          }
+          onStart={changeScreenHandler}
+          watcherLink={(
+            <WatcherLinkPane>
+              <WatcherLink size="large" getWatcherURL={broadcasterView.watcher} />
+            </WatcherLinkPane>
+          )}
         />
       )}
       {activeScreen && (
         <>
-          <VideoViewer video={activeScreen.stream} />
-          <ControlPane
-            className={classes.controlPane}
-            requestChangeScreen={selectScreenRequestHandler}
-            onCancelStream={cancelStreamHandler}
-            watcherLink={
-              <WatcherLink getWatcherURL={broadcasterView.watcher} />
-            }
-          />
+          <VideoViewer stream={activeScreen.stream} />
+          <ControlPane>
+            <Space wrap>
+              <WatcherLinkBtn watcherLink={<WatcherLink getWatcherURL={broadcasterView.watcher} />} />
+              <ChangeScreenControl onChange={changeScreenHandler} />
+              <CancelControl onCancel={cancelStreamHandler} />
+            </Space>
+          </ControlPane>
         </>
       )}
       <ScreensModal open={openSelector} onCancel={cancelSelectScreenHandler}>

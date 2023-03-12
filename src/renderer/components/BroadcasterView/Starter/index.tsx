@@ -1,24 +1,23 @@
 import React from 'react';
 import { Button } from 'antd';
-import classes from './StartScreen.module.scss';
-import WatcherLinkPane from './WatcherLinkPane';
+import classes from './Starter.module.scss';
 
-type StartScreenProps = {
+type StarterProps = {
   onStart(): void
   watcherLink: React.ReactNode,
 }
 
-function StartScreen(props: StartScreenProps) {
+function Starter(props: StarterProps) {
   const { onStart, watcherLink } = props;
 
   return (
     <div className={classes.container}>
       <Button onClick={onStart} type="primary" size="large">Start broadcasting</Button>
-      <WatcherLinkPane className={classes.link}>
+      <div className={classes.link}>
         {watcherLink}
-      </WatcherLinkPane>
+      </div>
     </div>
   );
 }
 
-export default React.memo(StartScreen);
+export default React.memo(Starter);

@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, Row } from 'antd';
 import { observer } from 'mobx-react';
 import ScreenItem from './Screen';
-import { SelectScreen, GetScreens } from '../BroadcasterView';
+import { SelectScreen, GetScreens } from '../BroadcacterViewStore';
 
 type ScreensProps = {
   getScreens: GetScreens

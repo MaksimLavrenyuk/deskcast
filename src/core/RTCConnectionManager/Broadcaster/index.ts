@@ -28,27 +28,19 @@ class Broadcaster {
     this.peerConnections = {};
     this.stream = null;
 
-    this.answerHandler = this.answerHandler.bind(this);
-    this.watcherHandler = this.watcherHandler.bind(this);
-    this.attachStream = this.attachStream.bind(this);
-    this.iceCandidateHandler = this.iceCandidateHandler.bind(this);
-    this.candidateHandler = this.candidateHandler.bind(this);
-    this.disconnectPeerHandler = this.disconnectPeerHandler.bind(this);
-    this.dispose = this.dispose.bind(this);
-
     this.sender.on('answer', this.answerHandler);
     this.sender.on('watcher', this.watcherHandler);
     this.sender.on('candidate', this.candidateHandler);
     this.sender.on('disconnectPeer', this.disconnectPeerHandler);
   }
 
-  private async answerHandler(id: string, description: RTCSessionDescriptionInit) {
+  private answerHandler = async (id: string, description: RTCSessionDescriptionInit) => {
     if (this.peerConnections[id]) {
       await this.peerConnections[id].setRemoteDescription(description);
     }
-  }
+  };
 
-  private async watcherHandler(id: string) {
+  private watcherHandler = async (id: string) => {
     const peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
 
     this.peerConnections[id] = peerConnection;
@@ -64,42 +56,42 @@ class Broadcaster {
     const sdp = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(sdp);
     this.sender.offer(id, peerConnection.localDescription);
-  }
+  };
 
-  private iceCandidateHandler(id: string, event: RTCPeerConnectionIceEventInit) {
+  private iceCandidateHandler = (id: string, event: RTCPeerConnectionIceEventInit) => {
     if (event.candidate) {
       this.sender.candidate(id, event.candidate);
     }
-  }
+  };
 
-  private async candidateHandler(id: string, candidate: RTCIceCandidateInit | null) {
+  private candidateHandler = async (id: string, candidate: RTCIceCandidateInit | null) => {
     if (this.peerConnections[id] && candidate) {
       await this.peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate));
     }
-  }
+  };
 
-  private disconnectPeerHandler(id: string) {
+  private disconnectPeerHandler = (id: string) => {
     const peerConnection = this.peerConnections[id];
 
     if (peerConnection) {
       peerConnection.close();
       delete this.peerConnections[id];
     }
-  }
+  };
 
-  public attachStream(stream: MediaStream) {
+  public attachStream = (stream: MediaStream) => {
     this.stream = stream;
     this.sender.broadcaster();
-  }
+  };
 
   public cancelStream = () => {
     this.stream = null;
     this.sender.cancel();
   };
 
-  public dispose() {
+  public dispose = () => {
     this.sender.close();
-  }
+  };
 }
 
 export default Broadcaster;

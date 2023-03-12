@@ -1,5 +1,5 @@
 import RendererSourceCollector from './index';
-import IpcManagerMock from '../../IpcManager/IpcManagerMock';
+import IpcManagerMock from '../../IpcManager/IpcManager.mock';
 
 test('Obtaining sources available, should obtain a set of sources', async () => {
   const ipcManager = new IpcManagerMock();

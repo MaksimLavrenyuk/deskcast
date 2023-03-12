@@ -1,4 +1,4 @@
-import IpcManagerMock from '../../IpcManager/IpcManagerMock';
+import IpcManagerMock from '../../IpcManager/IpcManager.mock';
 import RendererGetterWatcherURL from './index';
 
 test('Should get the url of where the server is running with Watcher', async () => {

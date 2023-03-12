@@ -1,30 +1,27 @@
 import React from 'react';
-import { Skeleton } from 'antd';
+import {
+  Input, Space, Button,
+} from 'antd';
 import { observer } from 'mobx-react';
-import classes from './WatcherLink.module.less';
+import { SizeType } from 'antd/es/config-provider/SizeContext';
 import CopyBtn from '../../CopyBtn';
-import { GetWatcherURL } from '../BroadcasterView';
+import { GetWatcherURL } from '../BroadcacterViewStore';
 
 type WatcherLinkProps = {
+  size?: SizeType
   getWatcherURL: GetWatcherURL
 }
 
 function WatcherLink(props: WatcherLinkProps) {
-  const { getWatcherURL } = props;
+  const { getWatcherURL, size } = props;
   const url = getWatcherURL();
 
   return (
-    <>
-      {url && (
-        <div className={classes.link_container}>
-          <div className={classes.link}>{url}</div>
-          <CopyBtn copyValue={url} size="large" />
-        </div>
-      )}
-      {!url && (
-        <Skeleton loading active />
-      )}
-    </>
+    <Space>
+      <Input disabled={url === null} size={size} style={{ width: '100%' }} value={url} />
+      {url === null && <Button loading size={size} />}
+      {url && <CopyBtn size={size} copyValue={url} />}
+    </Space>
   );
 }
 
