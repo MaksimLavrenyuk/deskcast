@@ -16,7 +16,7 @@ export type GetScreens = () => Screen[];
 
 export type GetWatcherURL = () => string | null;
 
-type BroadcasterViewProps = {
+type StreamerViewProps = {
   sourceCollector: SourceCollector
   getterWatcherURL: GetterWatcherURLI
 }
@@ -41,7 +41,7 @@ class StreamerViewStore {
 
   private getterWatcherURL: GetterWatcherURLI;
 
-  constructor(props: BroadcasterViewProps) {
+  constructor(props: StreamerViewProps) {
     this.streamer = new Streamer();
     this.sourceCollector = props.sourceCollector;
     this.getterWatcherURL = props.getterWatcherURL;

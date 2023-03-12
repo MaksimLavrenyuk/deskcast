@@ -7,78 +7,78 @@ type SenderSocket = SocketDefault<StreamerToBrokerEvents, BrokerToStreamerEvents
 type ReceiverSocket = SocketDefault<WatcherToBrokerEvents, BrokerToWatcherEvents>;
 
 class Broker {
-  public static PORT_SENDER = 4002;
+  public static PORT_STREAMER = 4002;
 
-  public static PORT_RECEIVER = 4003;
+  public static PORT_WATCHER = 4003;
 
-  private senderSocket: SenderSocket | null;
+  private streamerSocket: SenderSocket | null;
 
-  private readonly receiverSockets: Map<ReceiverSocket['id'], ReceiverSocket>;
+  private readonly watcherSockets: Map<ReceiverSocket['id'], ReceiverSocket>;
 
   constructor() {
-    this.senderSocket = null;
-    this.receiverSockets = new Map<ReceiverSocket['id'], ReceiverSocket>();
-    const senderServer = new Server(Broker.PORT_SENDER, {
+    this.streamerSocket = null;
+    this.watcherSockets = new Map<ReceiverSocket['id'], ReceiverSocket>();
+    const streamerServer = new Server(Broker.PORT_STREAMER, {
       cors: {
         origin: '*',
       },
     });
 
-    const receiverServer = new Server(Broker.PORT_RECEIVER, {
+    const watcherServer = new Server(Broker.PORT_WATCHER, {
       cors: {
         origin: '*',
       },
     });
 
-    senderServer.sockets.on('error', this.errorHandler);
-    senderServer.sockets.on('connection', this.senderConnectionHandler);
+    streamerServer.sockets.on('error', this.errorHandler);
+    streamerServer.sockets.on('connection', this.senderConnectionHandler);
 
-    receiverServer.sockets.on('error', this.errorHandler);
-    receiverServer.sockets.on('connection', this.receiverConnectionHandler);
+    watcherServer.sockets.on('error', this.errorHandler);
+    watcherServer.sockets.on('connection', this.receiverConnectionHandler);
   }
 
   private receiverConnectionHandler = (socket: ReceiverSocket) => {
-    this.receiverSockets.set(socket.id, socket);
+    this.watcherSockets.set(socket.id, socket);
 
     socket.on('watcher', () => {
-      this.senderSocket.emit('watcher', socket.id);
+      this.streamerSocket.emit('watcher', socket.id);
     });
 
     socket.on('disconnect', () => {
-      this.senderSocket.emit('disconnectPeer', socket.id);
+      this.streamerSocket.emit('disconnectPeer', socket.id);
     });
 
     socket.on('answer', (description) => {
-      this.senderSocket.emit('answer', socket.id, description);
+      this.streamerSocket.emit('answer', socket.id, description);
     });
 
     socket.on('candidate', (candidate) => {
-      this.senderSocket.emit('candidate', socket.id, candidate);
+      this.streamerSocket.emit('candidate', socket.id, candidate);
     });
   };
 
   private senderConnectionHandler = (socket: SenderSocket) => {
-    this.senderSocket = socket;
+    this.streamerSocket = socket;
 
-    socket.on('broadcaster', () => {
-      this.receiverSockets.forEach((receiver) => {
-        receiver.emit('broadcaster');
+    socket.on('startStream', () => {
+      this.watcherSockets.forEach((receiver) => {
+        receiver.emit('startStream');
       });
     });
     socket.on('offer', (id, description) => {
-      const receiver = this.receiverSockets.get(id);
+      const receiver = this.watcherSockets.get(id);
 
       receiver.emit('offer', description);
     });
 
     socket.on('cancel', () => {
-      this.receiverSockets.forEach((receiver) => {
+      this.watcherSockets.forEach((receiver) => {
         receiver.emit('cancelBroadcast');
       });
     });
 
-    this.senderSocket.on('disconnect', () => {
-      this.receiverSockets.forEach((receiver) => {
+    this.streamerSocket.on('disconnect', () => {
+      this.watcherSockets.forEach((receiver) => {
         receiver.emit('closeBroadcast');
       });
     });

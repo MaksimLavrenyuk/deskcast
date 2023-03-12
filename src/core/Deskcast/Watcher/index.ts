@@ -21,7 +21,7 @@ export type WatcherToBrokerEvents = {
 export type BrokerToWatcherEvents = {
   cancelBroadcast: () => void
   closeBroadcast: () => void
-  broadcaster: () => void
+  startStream: () => void
   offer: (description: RTCSessionDescriptionInit) => void;
 }
 
@@ -47,13 +47,13 @@ class Watcher {
 
     this.socket.on('connect', () => console.log('connect'));
     this.socket.on('offer', this.offerHandler);
-    this.socket.on('broadcaster', this.broadcasterHandler);
+    this.socket.on('startStream', this.attachStreamHandler);
     this.socket.on('closeBroadcast', this.closeBroadcastHandler);
     this.socket.on('cancelBroadcast', this.cancelBroadcastHandler);
     this.socket.emit('watcher');
   }
 
-  private broadcasterHandler = () => {
+  private attachStreamHandler = () => {
     this.socket.emit('watcher');
   };
 

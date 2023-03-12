@@ -8,7 +8,7 @@ export type StreamerToBrokerEvents = {
   cancel: () => void
   offer: (id: string, description: RTCSessionDescription) => void;
   candidate: (id: string, candidate: RTCIceCandidate) => void
-  broadcaster: () => void
+  startStream: () => void
 }
 
 export type BrokerToStreamerEvents = {
@@ -51,7 +51,6 @@ class Streamer {
   };
 
   private watcherHandler = async (id: string) => {
-    console.log('watcher');
     const peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
 
     this.peerConnections[id] = peerConnection;
@@ -92,7 +91,7 @@ class Streamer {
 
   public attachStream = (stream: MediaStream) => {
     this.stream = stream;
-    this.socket.emit('broadcaster');
+    this.socket.emit('startStream');
   };
 
   public cancelStream = () => {

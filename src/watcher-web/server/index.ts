@@ -26,11 +26,11 @@ class WatcherServer {
     });
 
     watcherApp.get('/connection_sender_uri', (req, res) => {
-      res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_SENDER}` });
+      res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_STREAMER}` });
     });
 
     watcherApp.get('/connection_receiver_uri', (req, res) => {
-      res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_RECEIVER}` });
+      res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_WATCHER}` });
     });
 
     watcherServer.listen(

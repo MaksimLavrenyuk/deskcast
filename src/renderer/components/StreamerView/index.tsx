@@ -50,7 +50,7 @@ function Streamer() {
   }, []);
 
   return (
-    <div className={classes.broadcaster}>
+    <div className={classes.streamer}>
       {!activeScreen && (
         <StartScreen
           onStart={changeScreenHandler}
