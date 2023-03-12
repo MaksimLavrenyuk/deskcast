@@ -2,7 +2,7 @@ import React, {
   memo, useCallback, useEffect, useRef,
 } from 'react';
 import { Card } from 'antd';
-import { Screen } from '../BroadcacterViewStore';
+import { Screen } from '../StreamerViewStore';
 
 type ScreenItemProps = {
   onSelect(screenID: string): void

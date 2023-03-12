@@ -2,7 +2,7 @@ import ip from 'ip';
 import express from 'express';
 import http from 'http';
 import path from 'path';
-import SocketConnectionManager from '../../core/RTCConnectionManager/SocketConnectionManager';
+import Broker from '../../core/Deskcast/Broker';
 
 class WatcherServer {
   private static WATCHER_PORT = 4010;
@@ -18,7 +18,7 @@ class WatcherServer {
 
     const watcherApp = express();
     const watcherServer = http.createServer(watcherApp);
-    const connectionManager = new SocketConnectionManager({
+    const connectionManager = new Broker({
       senderPort: WatcherServer.PORT_SENDER_SOCKET_CONNECTION,
       receiverPort: WatcherServer.PORT_RECEIVER_SOCKET_CONNECTION,
     });

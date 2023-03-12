@@ -1,13 +1,13 @@
 import { Server } from 'socket.io';
 import { Socket as ServerSocket } from 'socket.io/dist/socket';
 import { createServer } from 'http';
-import SocketReceiver from './SocketReceiver';
-import { mockRTCSessionDescription, mockCandidate } from '../../mocks/webrtc';
+import Receiver from './index';
+import { mockRTCSessionDescription, mockCandidate } from '../webrtc.mock';
 
 describe('Socket receiver testing', () => {
   let ioServer: Server;
   let serverSocket: ServerSocket;
-  let socketReceiver: SocketReceiver;
+  let receiver: Receiver;
 
   beforeAll((done) => {
     const httpServer = createServer();
@@ -28,18 +28,18 @@ describe('Socket receiver testing', () => {
         serverSocket = socket;
       });
 
-      socketReceiver = new SocketReceiver(uri);
-      socketReceiver.on('connectToManager', done);
+      receiver = new Receiver(uri);
+      receiver.on('connectToManager', done);
     });
   });
 
   afterAll(() => {
     ioServer.close();
-    socketReceiver.close();
+    receiver.close();
   });
 
   it('Getting an offer for RTCSessionDescription', (done) => {
-    socketReceiver.on('offer', (description) => {
+    receiver.on('offer', (description) => {
       expect(description.type).toBe(mockRTCSessionDescription.type);
       done();
     });
@@ -53,7 +53,7 @@ describe('Socket receiver testing', () => {
       done();
     });
 
-    socketReceiver.candidate(mockCandidate);
+    receiver.candidate(mockCandidate);
   });
 
   it('Sending rtc answer', (done) => {
@@ -62,7 +62,7 @@ describe('Socket receiver testing', () => {
       done();
     });
 
-    socketReceiver.answer(mockRTCSessionDescription);
+    receiver.answer(mockRTCSessionDescription);
   });
 
   it('Send a preview message after the broadcaster has created the stream', (done) => {
@@ -81,7 +81,7 @@ describe('Socket receiver testing', () => {
       done();
     });
 
-    socketReceiver.on('closeBroadcast', mockCloseBroadcasterHandler);
+    receiver.on('closeBroadcast', mockCloseBroadcasterHandler);
     serverSocket.emit('closeBroadcast');
   });
 });

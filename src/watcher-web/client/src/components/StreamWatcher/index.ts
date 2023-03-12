@@ -1,6 +1,6 @@
 import axios from 'axios';
-import Watcher, { StreamHandler } from '../../../../../core/RTCConnectionManager/Watcher';
-import SocketReceiver from '../../../../../core/RTCConnectionManager/Receiver/SocketReceiver/SocketReceiver';
+import Watcher, { StreamHandler } from '../../../../../core/Deskcast/Watcher';
+import Receiver from '../../../../../core/Deskcast/Broker/Receiver';
 import Component from '../Component';
 import ExpandIcon from '../../icons/expand_maximize_icon.svg';
 
@@ -83,7 +83,7 @@ class StreamWatcher extends Component<unknown, State> {
   private async createWatcher() {
     const connectionUri = await StreamWatcher.requestConnectionUri();
     if (connectionUri) {
-      this.watcher = new Watcher({ receiver: new SocketReceiver(connectionUri) });
+      this.watcher = new Watcher({ receiver: new Receiver(connectionUri) });
       this.watcher.addEventListener('stream', this.streamHandler);
       this.watcher.addEventListener('closeBroadcast', this.closeBroadcastHandler);
       this.watcher.addEventListener('cancelBroadcast', this.cancelBroadcastHandler);

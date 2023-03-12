@@ -1,7 +1,7 @@
-import { Sender } from '../Sender';
+import { SenderI } from '../Broker/Sender/types';
 
 type BroadcasterDeps = {
-  sender: Sender
+  sender: SenderI
 }
 
 type Connections = {
@@ -16,8 +16,8 @@ const PEER_CONNECTION_CONFIG = {
   // ],
 };
 
-class Broadcaster {
-  private readonly sender: Sender;
+class Streamer {
+  private readonly sender: SenderI;
 
   private readonly peerConnections: Connections;
 
@@ -94,4 +94,4 @@ class Broadcaster {
   };
 }
 
-export default Broadcaster;
+export default Streamer;

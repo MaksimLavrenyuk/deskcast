@@ -5,7 +5,7 @@ import {
 import { observer } from 'mobx-react';
 import { SizeType } from 'antd/es/config-provider/SizeContext';
 import CopyBtn from '../../CopyBtn';
-import { GetWatcherURL } from '../BroadcacterViewStore';
+import { GetWatcherURL } from '../StreamerViewStore';
 
 type WatcherLinkProps = {
   size?: SizeType

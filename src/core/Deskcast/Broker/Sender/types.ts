@@ -6,7 +6,7 @@ export type SenderEvents = {
   watcher(id: string): void
 };
 
-export interface Sender {
+export interface SenderI {
   offer(id: string, description: RTCSessionDescription): void
   candidate(id: string, candidate: RTCIceCandidate): void
   on<Event extends keyof SenderEvents>(event: Event, listener: SenderEvents[Event]): void

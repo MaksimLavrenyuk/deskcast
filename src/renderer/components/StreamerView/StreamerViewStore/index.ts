@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
-import Broadcaster from '../../../../core/RTCConnectionManager/Broadcaster';
-import SocketSender from '../../../../core/RTCConnectionManager/Sender/SocketSender';
+import Streamer from '../../../../core/Deskcast/Streamer';
+import Sender from '../../../../core/Deskcast/Broker/Sender';
 import { SourceCollector } from '../../../../core/SourceCollector/types';
 import { GetterWatcherURLI } from '../../../../core/GetterWatcherURL/types';
 
@@ -22,8 +22,8 @@ type BroadcasterViewProps = {
   getterWatcherURL: GetterWatcherURLI
 }
 
-class BroadcasterViewStore {
-  private broadcaster: Broadcaster;
+class StreamerViewStore {
+  private streamer: Streamer;
 
   @observable.ref
   private screens: Screen[] | null;
@@ -43,7 +43,7 @@ class BroadcasterViewStore {
   private getterWatcherURL: GetterWatcherURLI;
 
   constructor(props: BroadcasterViewProps) {
-    this.broadcaster = new Broadcaster({ sender: new SocketSender('ws://localhost:4002') });
+    this.streamer = new Streamer({ sender: new Sender('ws://localhost:4002') });
     this.sourceCollector = props.sourceCollector;
     this.getterWatcherURL = props.getterWatcherURL;
     this.screens = [];
@@ -65,7 +65,7 @@ class BroadcasterViewStore {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: streamID,
-            ...BroadcasterViewStore.videoConfig,
+            ...StreamerViewStore.videoConfig,
           },
         },
       });
@@ -121,7 +121,7 @@ class BroadcasterViewStore {
       };
     }));
 
-    this.broadcaster.attachStream(selectedScreen.stream);
+    this.streamer.attachStream(selectedScreen.stream);
   };
 
   getScreens: GetScreens = () => this.screens;
@@ -133,8 +133,8 @@ class BroadcasterViewStore {
   @action
   reset() {
     this.setScreens(this.screens.map((screen) => ({ ...screen, select: false })));
-    this.broadcaster.cancelStream();
+    this.streamer.cancelStream();
   }
 }
 
-export default BroadcasterViewStore;
+export default StreamerViewStore;

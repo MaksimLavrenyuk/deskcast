@@ -6,7 +6,7 @@ import {
   SenderToManagerEvents,
 } from '../types';
 
-type BrockerProps = {
+type BrokerProps = {
   senderPort: number
   receiverPort: number
 }
@@ -27,12 +27,12 @@ type ReceiverSocket = SocketDefault<
   { connection: (socket: SocketDefault) => void } & ReceiverToManagerEvents,
   ManagerToReceiverEvents>;
 
-class SocketConnectionManager {
+class Broker {
   private senderSocket: SenderSocket | null;
 
   private readonly receiverSockets: Map<ReceiverSocket['id'], ReceiverSocket>;
 
-  constructor(props: BrockerProps) {
+  constructor(props: BrokerProps) {
     this.senderSocket = null;
     this.receiverSockets = new Map<ReceiverSocket['id'], ReceiverSocket>();
     const senderServer = new Server(props.senderPort, {
@@ -107,4 +107,4 @@ class SocketConnectionManager {
   }
 }
 
-export default SocketConnectionManager;
+export default Broker;

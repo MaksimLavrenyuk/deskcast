@@ -1,9 +1,9 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
 import 'webrtc-adapter';
-import { Receiver } from '../Receiver';
+import { ReceiverI } from '../Broker/Receiver/types';
 
 type WatcherDeps = {
-  receiver: Receiver,
+  receiver: ReceiverI,
 }
 
 export type StreamHandler = {
@@ -25,7 +25,7 @@ const PEER_CONNECTION_CONFIG = {
 };
 
 class Watcher {
-  private readonly connectionReceiver: Receiver;
+  private readonly connectionReceiver: ReceiverI;
 
   private peerConnection: RTCPeerConnection | null;
 

@@ -1,9 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import { StrictEventEmitter } from 'strict-event-emitter';
-import { SenderEvents, Sender } from '../index';
+import { SenderEvents, SenderI } from './types';
 import { ManagerToSenderEvents, SenderToManagerEvents } from '../../types';
 
-class SocketSender implements Sender {
+class Sender implements SenderI {
   private socket: Socket<ManagerToSenderEvents, SenderToManagerEvents>;
 
   private eventEmitter: StrictEventEmitter<SenderEvents>;
@@ -64,4 +64,4 @@ class SocketSender implements Sender {
   };
 }
 
-export default SocketSender;
+export default Sender;

@@ -1,13 +1,13 @@
 import { createServer } from 'http';
 import { Server, Socket as ServerSocket } from 'socket.io';
-import SocketSender from './index';
-import { mockCandidate, mockRTCSessionDescription, mockDescriptionInit } from '../../mocks/webrtc';
+import Sender from './index';
+import { mockCandidate, mockRTCSessionDescription, mockDescriptionInit } from '../webrtc.mock';
 
 describe('Socket sender testing', () => {
   const receiverID = 'watcher-1234';
   let ioServer: Server;
   let serverSocket: ServerSocket;
-  let socketSender: SocketSender;
+  let sender: Sender;
 
   beforeAll((done) => {
     const httpServer = createServer();
@@ -28,18 +28,18 @@ describe('Socket sender testing', () => {
         serverSocket = socket;
       });
 
-      socketSender = new SocketSender(uri);
-      socketSender.on('connectToManager', done);
+      sender = new Sender(uri);
+      sender.on('connectToManager', done);
     });
   });
 
   afterAll(() => {
     ioServer.close();
-    socketSender.close();
+    sender.close();
   });
 
   it('Receiving events about the connected watcher', (done) => {
-    socketSender.on('watcher', (arg) => {
+    sender.on('watcher', (arg) => {
       expect(arg).toBe(receiverID);
       done();
     });
@@ -47,7 +47,7 @@ describe('Socket sender testing', () => {
   });
 
   it('Receiving an event about the disconnection of the watcher', (done) => {
-    socketSender.on('disconnectPeer', (arg) => {
+    sender.on('disconnectPeer', (arg) => {
       expect(arg).toBe(receiverID);
       done();
     });
@@ -55,7 +55,7 @@ describe('Socket sender testing', () => {
   });
 
   it('RTCIceCandidateInit API WebRTC dictionary get event', (done) => {
-    socketSender.on('candidate', (id, candidate) => {
+    sender.on('candidate', (id, candidate) => {
       expect(id).toBe(receiverID);
       expect(candidate.candidate === mockCandidate.candidate);
       done();
@@ -64,7 +64,7 @@ describe('Socket sender testing', () => {
   });
 
   it('getting sdp data', (done) => {
-    socketSender.on('answer', (id, candidate) => {
+    sender.on('answer', (id, candidate) => {
       expect(id).toBe(receiverID);
       expect(candidate.type === mockDescriptionInit.type);
       done();
@@ -80,7 +80,7 @@ describe('Socket sender testing', () => {
     });
     serverSocket.on('broadcaster', mockBroadcasterHandler);
 
-    socketSender.broadcaster();
+    sender.broadcaster();
   });
 
   it('sending an offer for RTCSessionDescription', (done) => {
@@ -90,7 +90,7 @@ describe('Socket sender testing', () => {
       done();
     });
 
-    socketSender.offer(receiverID, mockRTCSessionDescription);
+    sender.offer(receiverID, mockRTCSessionDescription);
   });
 
   it('sending an candidate for RTCIceCandidate', (done) => {
@@ -100,7 +100,7 @@ describe('Socket sender testing', () => {
       done();
     });
 
-    socketSender.candidate(receiverID, mockCandidate);
+    sender.candidate(receiverID, mockCandidate);
   });
 
   it('connection closing', (done) => {
@@ -111,6 +111,6 @@ describe('Socket sender testing', () => {
 
     serverSocket.on('disconnect', mockCloseHandler);
 
-    socketSender.close();
+    sender.close();
   });
 });
