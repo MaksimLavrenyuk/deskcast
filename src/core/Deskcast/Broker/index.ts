@@ -1,10 +1,6 @@
 import { Server, Socket as SocketDefault } from 'socket.io';
-import {
-  ManagerToReceiverEvents,
-  ManagerToSenderEvents,
-  ReceiverToManagerEvents,
-  SenderToManagerEvents,
-} from '../types';
+import { StreamerToBrokerEvents, BrokerToStreamerEvents } from '../Streamer';
+import { WatcherToBrokerEvents, BrokerToWatcherEvents } from '../Watcher';
 
 type BrokerProps = {
   senderPort: number
@@ -13,19 +9,19 @@ type BrokerProps = {
 
 type ListenEvents = {
   connection: (socket: SocketDefault) => void
-} & ReceiverToManagerEvents & SenderToManagerEvents;
+} & WatcherToBrokerEvents & StreamerToBrokerEvents;
 
-type EmitEvents = ManagerToSenderEvents & ManagerToReceiverEvents;
+type EmitEvents = BrokerToStreamerEvents & BrokerToWatcherEvents;
 
 export type Socket = SocketDefault<ListenEvents, EmitEvents>;
 
 type SenderSocket = SocketDefault<
-  { connection: (socket: SocketDefault) => void } & SenderToManagerEvents,
-  ManagerToSenderEvents>;
+  { connection: (socket: SocketDefault) => void } & StreamerToBrokerEvents,
+  BrokerToStreamerEvents>;
 
 type ReceiverSocket = SocketDefault<
-  { connection: (socket: SocketDefault) => void } & ReceiverToManagerEvents,
-  ManagerToReceiverEvents>;
+  { connection: (socket: SocketDefault) => void } & WatcherToBrokerEvents,
+  BrokerToWatcherEvents>;
 
 class Broker {
   private senderSocket: SenderSocket | null;

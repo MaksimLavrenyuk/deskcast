@@ -1,6 +1,5 @@
 import { action, makeObservable, observable } from 'mobx';
 import Streamer from '../../../../core/Deskcast/Streamer';
-import Sender from '../../../../core/Deskcast/Broker/Sender';
 import { SourceCollector } from '../../../../core/SourceCollector/types';
 import { GetterWatcherURLI } from '../../../../core/GetterWatcherURL/types';
 
@@ -43,7 +42,7 @@ class StreamerViewStore {
   private getterWatcherURL: GetterWatcherURLI;
 
   constructor(props: BroadcasterViewProps) {
-    this.streamer = new Streamer({ sender: new Sender('ws://localhost:4002') });
+    this.streamer = new Streamer();
     this.sourceCollector = props.sourceCollector;
     this.getterWatcherURL = props.getterWatcherURL;
     this.screens = [];

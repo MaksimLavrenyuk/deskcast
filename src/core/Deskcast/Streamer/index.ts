@@ -1,12 +1,22 @@
-import { SenderI } from '../Broker/Sender/types';
-
-type BroadcasterDeps = {
-  sender: SenderI
-}
+import { io, Socket } from 'socket.io-client';
 
 type Connections = {
   [id: string]: RTCPeerConnection
 };
+
+export type StreamerToBrokerEvents = {
+  cancel: () => void
+  offer: (id: string, description: RTCSessionDescription) => void;
+  candidate: (id: string, candidate: RTCIceCandidate) => void
+  broadcaster: () => void
+}
+
+export type BrokerToStreamerEvents = {
+  watcher: (id: string) => void
+  candidate: (id: string, candidate: RTCIceCandidateInit) => void
+  answer: (id: string, description: RTCSessionDescriptionInit) => void;
+  disconnectPeer: (id: string) => void
+}
 
 const PEER_CONNECTION_CONFIG = {
   // iceServers: [
@@ -17,21 +27,21 @@ const PEER_CONNECTION_CONFIG = {
 };
 
 class Streamer {
-  private readonly sender: SenderI;
+  private socket: Socket<BrokerToStreamerEvents, StreamerToBrokerEvents>;
 
   private readonly peerConnections: Connections;
 
   private stream: MediaStream | null;
 
-  constructor(deps: BroadcasterDeps) {
-    this.sender = deps.sender;
+  constructor() {
+    this.socket = io('ws://localhost:4002');
     this.peerConnections = {};
     this.stream = null;
 
-    this.sender.on('answer', this.answerHandler);
-    this.sender.on('watcher', this.watcherHandler);
-    this.sender.on('candidate', this.candidateHandler);
-    this.sender.on('disconnectPeer', this.disconnectPeerHandler);
+    this.socket.on('answer', this.answerHandler);
+    this.socket.on('watcher', this.watcherHandler);
+    this.socket.on('candidate', this.candidateHandler);
+    this.socket.on('disconnectPeer', this.disconnectPeerHandler);
   }
 
   private answerHandler = async (id: string, description: RTCSessionDescriptionInit) => {
@@ -41,6 +51,7 @@ class Streamer {
   };
 
   private watcherHandler = async (id: string) => {
+    console.log('watcher');
     const peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
 
     this.peerConnections[id] = peerConnection;
@@ -55,12 +66,12 @@ class Streamer {
 
     const sdp = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(sdp);
-    this.sender.offer(id, peerConnection.localDescription);
+    this.socket.emit('offer', id, peerConnection.localDescription);
   };
 
   private iceCandidateHandler = (id: string, event: RTCPeerConnectionIceEventInit) => {
     if (event.candidate) {
-      this.sender.candidate(id, event.candidate);
+      this.socket.emit('candidate', id, event.candidate);
     }
   };
 
@@ -81,16 +92,16 @@ class Streamer {
 
   public attachStream = (stream: MediaStream) => {
     this.stream = stream;
-    this.sender.broadcaster();
+    this.socket.emit('broadcaster');
   };
 
   public cancelStream = () => {
     this.stream = null;
-    this.sender.cancel();
+    this.socket.emit('cancel');
   };
 
   public dispose = () => {
-    this.sender.close();
+    this.socket.close();
   };
 }
 

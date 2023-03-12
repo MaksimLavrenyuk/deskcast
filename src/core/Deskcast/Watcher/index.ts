@@ -1,10 +1,6 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
 import 'webrtc-adapter';
-import { ReceiverI } from '../Broker/Receiver/types';
-
-type WatcherDeps = {
-  receiver: ReceiverI,
-}
+import { io, Socket } from 'socket.io-client';
 
 export type StreamHandler = {
   (stream: MediaStream): void
@@ -16,6 +12,19 @@ export type WatcherEvents = {
   closeBroadcast(): void
 }
 
+export type WatcherToBrokerEvents = {
+  answer: (description: RTCSessionDescription) => void;
+  candidate: (candidate: RTCIceCandidate) => void
+  watcher: () => void
+}
+
+export type BrokerToWatcherEvents = {
+  cancelBroadcast: () => void
+  closeBroadcast: () => void
+  broadcaster: () => void
+  offer: (description: RTCSessionDescriptionInit) => void;
+}
+
 const PEER_CONNECTION_CONFIG = {
   // iceServers: [
   //   {
@@ -25,21 +34,28 @@ const PEER_CONNECTION_CONFIG = {
 };
 
 class Watcher {
-  private readonly connectionReceiver: ReceiverI;
+  private socket: Socket<BrokerToWatcherEvents, WatcherToBrokerEvents>;
 
   private peerConnection: RTCPeerConnection | null;
 
   private eventEmitter: StrictEventEmitter<WatcherEvents>;
 
-  constructor(deps: WatcherDeps) {
-    this.connectionReceiver = deps.receiver;
+  constructor(uri: string) {
+    this.socket = io(uri);
     this.peerConnection = null;
     this.eventEmitter = new StrictEventEmitter<WatcherEvents>();
 
-    this.connectionReceiver.on('offer', this.offerHandler);
-    this.connectionReceiver.on('closeBroadcast', this.closeBroadcastHandler);
-    this.connectionReceiver.on('cancelBroadcast', this.cancelBroadcastHandler);
+    this.socket.on('connect', () => console.log('connect'));
+    this.socket.on('offer', this.offerHandler);
+    this.socket.on('broadcaster', this.broadcasterHandler);
+    this.socket.on('closeBroadcast', this.closeBroadcastHandler);
+    this.socket.on('cancelBroadcast', this.cancelBroadcastHandler);
+    this.socket.emit('watcher');
   }
+
+  private broadcasterHandler = () => {
+    this.socket.emit('watcher');
+  };
 
   private offerHandler = async (description: RTCSessionDescriptionInit) => {
     this.peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
@@ -50,7 +66,7 @@ class Watcher {
       await this.peerConnection.setRemoteDescription(description);
       const sdp = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(sdp);
-      this.connectionReceiver.answer(this.peerConnection.localDescription);
+      this.socket.emit('answer', this.peerConnection.localDescription);
     } catch (e) {
       console.log(e);
     }
@@ -70,7 +86,7 @@ class Watcher {
   };
 
   private iceCandidateHandler = (event: RTCPeerConnectionIceEvent) => {
-    this.connectionReceiver.candidate(event.candidate);
+    this.socket.emit('candidate', event.candidate);
   };
 
   public addEventListener = <Event extends keyof WatcherEvents>(event: Event, listener: WatcherEvents[Event]) => {
@@ -82,7 +98,7 @@ class Watcher {
   };
 
   public dispose() {
-    this.connectionReceiver.close();
+    this.socket.close();
     this.peerConnection.close();
   }
 }
