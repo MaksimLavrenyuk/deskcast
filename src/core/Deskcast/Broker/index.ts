@@ -1,10 +1,9 @@
-import { Server, Socket as SocketDefault } from 'socket.io';
-import { StreamerToBrokerEvents, BrokerToStreamerEvents } from '../Streamer';
-import { WatcherToBrokerEvents, BrokerToWatcherEvents } from '../Watcher';
+import { Server, Socket } from 'socket.io';
+import { nanoid } from 'nanoid';
+import { StreamerToBrokerEvents, BrokerToStreamerEvents, Payload } from '../Streamer';
+import isType from '../../../utils/guards/isType';
 
-type SenderSocket = SocketDefault<StreamerToBrokerEvents, BrokerToStreamerEvents>;
-
-type ReceiverSocket = SocketDefault<WatcherToBrokerEvents, BrokerToWatcherEvents>;
+type SenderSocket = Socket<StreamerToBrokerEvents, BrokerToStreamerEvents>;
 
 class Broker {
   public static PORT_STREAMER = 4002;
@@ -13,11 +12,10 @@ class Broker {
 
   private streamerSocket: SenderSocket | null;
 
-  private readonly watcherSockets: Map<ReceiverSocket['id'], ReceiverSocket>;
+  private readonly watcherSockets = new Map<string, Socket>();
 
   constructor() {
     this.streamerSocket = null;
-    this.watcherSockets = new Map<ReceiverSocket['id'], ReceiverSocket>();
     const streamerServer = new Server(Broker.PORT_STREAMER, {
       cors: {
         origin: '*',
@@ -31,58 +29,35 @@ class Broker {
     });
 
     streamerServer.sockets.on('error', this.errorHandler);
-    streamerServer.sockets.on('connection', this.senderConnectionHandler);
+    streamerServer.sockets.on('connection', (socket) => {
+      this.streamerSocket = socket;
+
+      socket.onAny((event, ...args) => {
+        const payload = args[0];
+
+        if (isType<Payload>(payload, 'id')) {
+          const { id, ...rest } = payload;
+          const watcher = this.watcherSockets.get(id);
+
+          watcher.emit(event, rest);
+        } else {
+          this.watcherSockets.forEach((watcher) => {
+            watcher.emit(event);
+          });
+        }
+      });
+    });
 
     watcherServer.sockets.on('error', this.errorHandler);
-    watcherServer.sockets.on('connection', this.receiverConnectionHandler);
+    watcherServer.sockets.on('connection', (socket) => {
+      const watcherID = nanoid();
+      this.watcherSockets.set(watcherID, socket);
+
+      socket.onAny((event, ...args) => {
+        this.streamerSocket.emit(event, { id: watcherID, ...args[0] });
+      });
+    });
   }
-
-  private receiverConnectionHandler = (socket: ReceiverSocket) => {
-    this.watcherSockets.set(socket.id, socket);
-
-    socket.on('watcher', () => {
-      this.streamerSocket.emit('watcher', socket.id);
-    });
-
-    socket.on('disconnect', () => {
-      this.streamerSocket.emit('disconnectPeer', socket.id);
-    });
-
-    socket.on('answer', (description) => {
-      this.streamerSocket.emit('answer', socket.id, description);
-    });
-
-    socket.on('candidate', (candidate) => {
-      this.streamerSocket.emit('candidate', socket.id, candidate);
-    });
-  };
-
-  private senderConnectionHandler = (socket: SenderSocket) => {
-    this.streamerSocket = socket;
-
-    socket.on('startStream', () => {
-      this.watcherSockets.forEach((receiver) => {
-        receiver.emit('startStream');
-      });
-    });
-    socket.on('offer', (id, description) => {
-      const receiver = this.watcherSockets.get(id);
-
-      receiver.emit('offer', description);
-    });
-
-    socket.on('cancel', () => {
-      this.watcherSockets.forEach((receiver) => {
-        receiver.emit('cancelBroadcast');
-      });
-    });
-
-    this.streamerSocket.on('disconnect', () => {
-      this.watcherSockets.forEach((receiver) => {
-        receiver.emit('closeBroadcast');
-      });
-    });
-  };
 
   // eslint-disable-next-line class-methods-use-this
   private errorHandler(error: unknown) {

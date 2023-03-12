@@ -4,18 +4,22 @@ type Connections = {
   [id: string]: RTCPeerConnection
 };
 
+export type Payload = {
+  id: string,
+}
+
 export type StreamerToBrokerEvents = {
   cancel: () => void
-  offer: (id: string, description: RTCSessionDescription) => void;
-  candidate: (id: string, candidate: RTCIceCandidate) => void
+  offer: (payload: Payload & { description: RTCSessionDescription }) => void;
+  candidate: (payload: Payload & { candidate: RTCIceCandidate | null }) => void
   startStream: () => void
 }
 
 export type BrokerToStreamerEvents = {
-  watcher: (id: string) => void
-  candidate: (id: string, candidate: RTCIceCandidateInit) => void
-  answer: (id: string, description: RTCSessionDescriptionInit) => void;
-  disconnectPeer: (id: string) => void
+  watcher: (payload: Payload) => void
+  candidate: (payload: Payload & { candidate: RTCIceCandidateInit }) => void
+  answer: (payload: Payload & { description: RTCSessionDescriptionInit }) => void;
+  disconnectPeer: (payload: Payload) => void
 }
 
 const PEER_CONNECTION_CONFIG = {
@@ -44,48 +48,48 @@ class Streamer {
     this.socket.on('disconnectPeer', this.disconnectPeerHandler);
   }
 
-  private answerHandler = async (id: string, description: RTCSessionDescriptionInit) => {
-    if (this.peerConnections[id]) {
-      await this.peerConnections[id].setRemoteDescription(description);
+  private answerHandler = async (payload: Payload & { description: RTCSessionDescription }) => {
+    if (this.peerConnections[payload.id]) {
+      await this.peerConnections[payload.id].setRemoteDescription(payload.description);
     }
   };
 
-  private watcherHandler = async (id: string) => {
+  private watcherHandler = async (payload: Payload) => {
     const peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
 
-    this.peerConnections[id] = peerConnection;
+    this.peerConnections[payload.id] = peerConnection;
 
     if (this.stream) {
       this.stream.getTracks().forEach((track) => peerConnection.addTrack(track, this.stream));
     }
 
     peerConnection.addEventListener('icecandidate', (event) => {
-      this.iceCandidateHandler(id, event);
+      this.iceCandidateHandler(payload.id, event);
     });
 
     const sdp = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(sdp);
-    this.socket.emit('offer', id, peerConnection.localDescription);
+    this.socket.emit('offer', { id: payload.id, description: peerConnection.localDescription });
   };
 
   private iceCandidateHandler = (id: string, event: RTCPeerConnectionIceEventInit) => {
     if (event.candidate) {
-      this.socket.emit('candidate', id, event.candidate);
+      this.socket.emit('candidate', { id, candidate: event.candidate });
     }
   };
 
-  private candidateHandler = async (id: string, candidate: RTCIceCandidateInit | null) => {
-    if (this.peerConnections[id] && candidate) {
-      await this.peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate));
+  private candidateHandler = async (payload: Payload & { candidate: RTCIceCandidateInit | null }) => {
+    if (this.peerConnections[payload.id] && payload.candidate) {
+      await this.peerConnections[payload.id].addIceCandidate(new RTCIceCandidate(payload.candidate));
     }
   };
 
-  private disconnectPeerHandler = (id: string) => {
-    const peerConnection = this.peerConnections[id];
+  private disconnectPeerHandler = (payload: Payload) => {
+    const peerConnection = this.peerConnections[payload.id];
 
     if (peerConnection) {
       peerConnection.close();
-      delete this.peerConnections[id];
+      delete this.peerConnections[payload.id];
     }
   };
 
