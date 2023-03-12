@@ -7,10 +7,6 @@ import Broker from '../../core/Deskcast/Broker';
 class WatcherServer {
   private static WATCHER_PORT = 4010;
 
-  private static PORT_SENDER_SOCKET_CONNECTION = 4002;
-
-  private static PORT_RECEIVER_SOCKET_CONNECTION = 4003;
-
   private readonly addressInLocalNetwork: string;
 
   constructor() {
@@ -18,10 +14,7 @@ class WatcherServer {
 
     const watcherApp = express();
     const watcherServer = http.createServer(watcherApp);
-    const connectionManager = new Broker({
-      senderPort: WatcherServer.PORT_SENDER_SOCKET_CONNECTION,
-      receiverPort: WatcherServer.PORT_RECEIVER_SOCKET_CONNECTION,
-    });
+    const broker = new Broker();
 
     watcherApp.use(express.static('node_modules'));
     // watcherApp.use(express.static(path.resolve('src/watcher-web/client/dist/')));
@@ -33,11 +26,11 @@ class WatcherServer {
     });
 
     watcherApp.get('/connection_sender_uri', (req, res) => {
-      res.send({ url: `ws://${this.addressInLocalNetwork}:${WatcherServer.PORT_SENDER_SOCKET_CONNECTION}` });
+      res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_SENDER}` });
     });
 
     watcherApp.get('/connection_receiver_uri', (req, res) => {
-      res.send({ url: `ws://${this.addressInLocalNetwork}:${WatcherServer.PORT_RECEIVER_SOCKET_CONNECTION}` });
+      res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_RECEIVER}` });
     });
 
     watcherServer.listen(

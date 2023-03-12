@@ -2,42 +2,29 @@ import { Server, Socket as SocketDefault } from 'socket.io';
 import { StreamerToBrokerEvents, BrokerToStreamerEvents } from '../Streamer';
 import { WatcherToBrokerEvents, BrokerToWatcherEvents } from '../Watcher';
 
-type BrokerProps = {
-  senderPort: number
-  receiverPort: number
-}
+type SenderSocket = SocketDefault<StreamerToBrokerEvents, BrokerToStreamerEvents>;
 
-type ListenEvents = {
-  connection: (socket: SocketDefault) => void
-} & WatcherToBrokerEvents & StreamerToBrokerEvents;
-
-type EmitEvents = BrokerToStreamerEvents & BrokerToWatcherEvents;
-
-export type Socket = SocketDefault<ListenEvents, EmitEvents>;
-
-type SenderSocket = SocketDefault<
-  { connection: (socket: SocketDefault) => void } & StreamerToBrokerEvents,
-  BrokerToStreamerEvents>;
-
-type ReceiverSocket = SocketDefault<
-  { connection: (socket: SocketDefault) => void } & WatcherToBrokerEvents,
-  BrokerToWatcherEvents>;
+type ReceiverSocket = SocketDefault<WatcherToBrokerEvents, BrokerToWatcherEvents>;
 
 class Broker {
+  public static PORT_SENDER = 4002;
+
+  public static PORT_RECEIVER = 4003;
+
   private senderSocket: SenderSocket | null;
 
   private readonly receiverSockets: Map<ReceiverSocket['id'], ReceiverSocket>;
 
-  constructor(props: BrokerProps) {
+  constructor() {
     this.senderSocket = null;
     this.receiverSockets = new Map<ReceiverSocket['id'], ReceiverSocket>();
-    const senderServer = new Server(props.senderPort, {
+    const senderServer = new Server(Broker.PORT_SENDER, {
       cors: {
         origin: '*',
       },
     });
 
-    const receiverServer = new Server(props.receiverPort, {
+    const receiverServer = new Server(Broker.PORT_RECEIVER, {
       cors: {
         origin: '*',
       },
