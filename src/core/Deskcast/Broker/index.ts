@@ -54,7 +54,11 @@ class Broker {
       this.watcherSockets.set(watcherID, socket);
 
       socket.onAny((event, ...args) => {
-        this.streamerSocket.emit(event, { id: watcherID, ...args[0] });
+        if (event === 'disconnect') {
+          this.streamerSocket.emit('disconnectPeer', { id: watcherID, ...args[0] });
+        } else {
+          this.streamerSocket.emit(event, { id: watcherID, ...args[0] });
+        }
       });
     });
   }
