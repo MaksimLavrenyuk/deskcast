@@ -8,8 +8,8 @@ export type StreamHandler = {
 
 export type WatcherEvents = {
   stream: StreamHandler
-  cancelBroadcast(): void
-  closeBroadcast(): void
+  cancelStream(): void
+  closeStream(): void
 }
 
 export type WatcherToBrokerEvents = {
@@ -66,11 +66,11 @@ class Watcher {
 
   private closeBroadcastHandler = () => {
     this.peerConnection = null;
-    this.eventEmitter.emit('closeBroadcast');
+    this.eventEmitter.emit('closeStream');
   };
 
   private cancelBroadcastHandler = () => {
-    this.eventEmitter.emit('cancelBroadcast');
+    this.eventEmitter.emit('cancelStream');
   };
 
   private trackHandler = (event: RTCTrackEvent) => {

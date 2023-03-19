@@ -84,8 +84,8 @@ class StreamWatcher extends Component<unknown, State> {
     if (connectionUri) {
       this.watcher = new Watcher(connectionUri);
       this.watcher.addEventListener('stream', this.streamHandler);
-      this.watcher.addEventListener('closeBroadcast', this.closeBroadcastHandler);
-      this.watcher.addEventListener('cancelBroadcast', this.cancelBroadcastHandler);
+      this.watcher.addEventListener('closeStream', this.closeBroadcastHandler);
+      this.watcher.addEventListener('cancelStream', this.cancelBroadcastHandler);
     }
   }
 
