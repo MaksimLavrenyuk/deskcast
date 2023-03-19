@@ -14,22 +14,6 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-app.on('quit', (e) => {
-  console.log('fvfv');
-});
-
-
-
-
-app.on('will-quit', (e) => {
-  console.log('fvfv');
-});
-
-
-
-app.on('before-quit', (e) => {
-  console.log('fvfv');
-});
 /**
  * This method will be called when Electron has finished
  * initialization and is ready to create browser windows.

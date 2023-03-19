@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import Logger from '../../Logger/types';
 
 type Connections = {
   [id: string]: RTCPeerConnection
@@ -36,10 +37,14 @@ class Streamer {
 
   private stream: MediaStream | null;
 
-  constructor() {
+  private logger: Logger;
+
+  constructor(logger: Logger) {
     this.socket = io('ws://localhost:4002');
+    this.logger = logger;
     this.peerConnections = {};
     this.stream = null;
+    this.logger.write({ level: 'info', message: 'streamer_start' });
 
     this.socket.on('answer', this.answerHandler);
     this.socket.on('watch', this.watchHandler);
@@ -48,8 +53,13 @@ class Streamer {
   }
 
   private answerHandler = async (payload: Payload & { description: RTCSessionDescription }) => {
-    if (this.peerConnections[payload.id]) {
-      await this.peerConnections[payload.id].setRemoteDescription(payload.description);
+    try {
+      if (this.peerConnections[payload.id]) {
+        await this.peerConnections[payload.id].setRemoteDescription(payload.description);
+        this.logger.write({ level: 'info', message: 'streamer_received_answer', details: { id: payload.id, description: payload.description } });
+      }
+    } catch (e) {
+      this.logger.write({ level: 'error', message: 'streamer_received_answer', details: { id: payload.id, error: String(e) } });
     }
   };
 
@@ -64,13 +74,19 @@ class Streamer {
 
   private iceCandidateHandler = (id: string, event: RTCPeerConnectionIceEventInit) => {
     if (event.candidate) {
+      this.logger.write({ level: 'info', message: 'streamer_received_ice_candidate', details: { id, candidate: event.candidate } });
       this.socket.emit('candidate', { id, candidate: event.candidate });
     }
   };
 
   private candidateHandler = async (payload: Payload & { candidate: RTCIceCandidateInit | null }) => {
-    if (this.peerConnections[payload.id] && payload.candidate) {
-      await this.peerConnections[payload.id].addIceCandidate(new RTCIceCandidate(payload.candidate));
+    try {
+      if (this.peerConnections[payload.id] && payload.candidate) {
+        await this.peerConnections[payload.id].addIceCandidate(new RTCIceCandidate(payload.candidate));
+        this.logger.write({ level: 'info', message: 'streamer_received_candidate', details: { id: payload.id, candidate: payload.candidate } });
+      }
+    } catch (e) {
+      this.logger.write({ level: 'error', message: 'streamer_received_candidate', details: { id: payload.id, error: String(e) } });
     }
   };
 
@@ -110,10 +126,15 @@ class Streamer {
    * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer}
    */
   private async createOffer(peerConnection: RTCPeerConnection, connectionID: string) {
-    const sdp = await peerConnection.createOffer();
+    try {
+      const sdp = await peerConnection.createOffer();
 
-    await peerConnection.setLocalDescription(sdp);
-    this.socket.emit('offer', { id: connectionID, description: peerConnection.localDescription });
+      await peerConnection.setLocalDescription(sdp);
+      this.socket.emit('offer', { id: connectionID, description: peerConnection.localDescription });
+      this.logger.write({ level: 'info', message: 'streamer_create_offer', details: { id: connectionID, sdp } });
+    } catch (e) {
+      this.logger.write({ level: 'error', message: 'streamer_create_offer', details: { id: connectionID, error: String(e) } });
+    }
   }
 
   /**
@@ -125,7 +146,11 @@ class Streamer {
     if (this.stream) {
       const tracks = this.stream.getTracks();
       tracks.forEach((track) => {
-        peerConnection.addTrack(track, this.stream);
+        try {
+          peerConnection.addTrack(track, this.stream);
+        } catch (e) {
+          this.logger.write({ level: 'error', message: 'streamer_add_track', details: { error: String(e) } });
+        }
       });
     }
   }
@@ -134,9 +159,13 @@ class Streamer {
     const connectionsIDs = Object.keys(this.peerConnections);
 
     connectionsIDs.forEach((connectionID) => {
-      const peerConnection = this.peerConnections[connectionID];
-      const senders = peerConnection.getSenders();
-      senders.forEach((sender) => peerConnection.removeTrack(sender));
+      try {
+        const peerConnection = this.peerConnections[connectionID];
+        const senders = peerConnection.getSenders();
+        senders.forEach((sender) => peerConnection.removeTrack(sender));
+      } catch (e) {
+        this.logger.write({ level: 'error', message: 'streamer_remove_track', details: { error: String(e) } });
+      }
     });
   }
 

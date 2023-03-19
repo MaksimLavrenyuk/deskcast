@@ -1,6 +1,7 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
 import 'webrtc-adapter';
 import { io, Socket } from 'socket.io-client';
+import Logger from '../../Logger/types';
 
 export type StreamHandler = {
   (stream: MediaStream): void
@@ -38,9 +39,12 @@ class Watcher {
 
   private eventEmitter: StrictEventEmitter<WatcherEvents>;
 
-  constructor(uri: string) {
+  private logger: Logger;
+
+  constructor(uri: string, logger: Logger) {
     this.socket = io(uri);
     this.peerConnection = null;
+    this.logger = logger;
     this.eventEmitter = new StrictEventEmitter<WatcherEvents>();
 
     this.peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
@@ -48,36 +52,43 @@ class Watcher {
     this.peerConnection.addEventListener('icecandidate', this.iceCandidateHandler);
 
     this.socket.on('offer', this.offerHandler);
-    this.socket.on('disconnect', this.closeBroadcastHandler);
-    this.socket.on('cancelStream', this.cancelBroadcastHandler);
+    this.socket.on('disconnect', this.closeStreamHandler);
+    this.socket.on('cancelStream', this.cancelStreamHandler);
     this.socket.emit('watch');
   }
 
   private offerHandler = async (payload: { description: RTCSessionDescriptionInit }) => {
+    this.logger.write({ level: 'info', message: 'watcher_offer', details: { id: this.socket.id, description: payload.description } });
+
     try {
       await this.peerConnection.setRemoteDescription(payload.description);
       const sdp = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(sdp);
+      this.logger.write({ level: 'info', message: 'watcher_local_description', details: { id: this.socket.id, sdp } });
       this.socket.emit('answer', { description: this.peerConnection.localDescription });
     } catch (e) {
-      console.log(e);
+      this.logger.write({ level: 'error', message: 'watcher_local_description', details: { id: this.socket.id, error: String(e) } });
     }
   };
 
-  private closeBroadcastHandler = () => {
+  private closeStreamHandler = () => {
     this.peerConnection = null;
     this.eventEmitter.emit('closeStream');
+    this.logger.write({ level: 'info', message: 'watcher_close_stream', details: { id: this.socket.id } });
   };
 
-  private cancelBroadcastHandler = () => {
+  private cancelStreamHandler = () => {
     this.eventEmitter.emit('cancelStream');
+    this.logger.write({ level: 'info', message: 'watcher_cancel_stream', details: { id: this.socket.id } });
   };
 
   private trackHandler = (event: RTCTrackEvent) => {
+    this.logger.write({ level: 'info', message: 'watcher_received_track', details: { id: this.socket.id, kind: event.track.kind } });
     this.eventEmitter.emit('stream', event.streams[0]);
   };
 
   private iceCandidateHandler = (event: RTCPeerConnectionIceEvent) => {
+    this.logger.write({ level: 'info', message: 'watcher_received_candidate', details: { id: this.socket.id, candidate: event.candidate } });
     this.socket.emit('candidate', { candidate: event.candidate });
   };
 
@@ -90,6 +101,7 @@ class Watcher {
   };
 
   public dispose() {
+    this.logger.write({ level: 'info', message: 'watcher_dispose', details: { id: this.socket.id } });
     this.socket.close();
     this.peerConnection.close();
   }

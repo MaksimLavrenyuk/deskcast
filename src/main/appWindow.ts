@@ -5,6 +5,7 @@ import path from 'path';
 import IpcManager from '../core/IpcManager';
 import WatcherServer from '../watcher-web/server';
 import { inDev } from '../common/helpers';
+import DiskLogger from '../core/Logger/DiskLogger';
 
 // Electron Forge automatically creates these entry points
 declare const APP_WINDOW_WEBPACK_ENTRY: string;
@@ -17,6 +18,7 @@ const watcherServer = new WatcherServer();
  */
 function registerMainIPC(appWindow: BrowserWindow) {
   const impManager = new IpcManager({ ipcMain });
+  const logger = new DiskLogger();
 
   impManager.handle('screenSources', async () => {
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
@@ -33,6 +35,9 @@ function registerMainIPC(appWindow: BrowserWindow) {
   });
 
   impManager.handle('watcherUrl', () => ({ url: watcherServer.getWatcherServerLink() }));
+  impManager.handle('log', (data) => {
+    if (data) logger.write(data);
+  });
 }
 
 /**

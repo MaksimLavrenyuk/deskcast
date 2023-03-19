@@ -20,12 +20,14 @@ import RendererGetterWatcherURL from '../../../core/GetterWatcherURL/RendererGet
 import WatcherLinkBtn from './WatcherLink/WatcherLinkBtn';
 import ChangeScreenControl from './Controls/ChangeScreenControl';
 import CancelControl from './Controls/CancelControl';
+import RendererLogger from '../../../core/Logger/RendererLogger';
 
 function Streamer() {
   const streamer = useMemo(() => {
     const ipcManager = IpcManager.getInRenderer();
 
     return new StreamerViewStore({
+      logger: new RendererLogger(ipcManager),
       sourceCollector: new RendererSourceCollector(ipcManager),
       getterWatcherURL: new RendererGetterWatcherURL(ipcManager),
     });

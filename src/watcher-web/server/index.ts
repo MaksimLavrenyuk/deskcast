@@ -1,8 +1,11 @@
 import ip from 'ip';
 import express from 'express';
+import bodyParser from 'body-parser';
 import http from 'http';
 import path from 'path';
 import Broker from '../../core/Deskcast/Broker';
+import ClientLogger from '../../core/Logger/ClientLogger';
+import DiskLogger from '../../core/Logger/DiskLogger';
 
 class WatcherServer {
   private static WATCHER_PORT = 4010;
@@ -15,6 +18,9 @@ class WatcherServer {
     const watcherApp = express();
     const watcherServer = http.createServer(watcherApp);
     const broker = new Broker();
+    const logger = new DiskLogger();
+
+    watcherApp.use(bodyParser.json());
 
     watcherApp.use(express.static('node_modules'));
     // watcherApp.use(express.static(path.resolve('src/watcher-web/client/dist/')));
@@ -31,6 +37,11 @@ class WatcherServer {
 
     watcherApp.get('/connection_receiver_uri', (req, res) => {
       res.send({ url: `ws://${this.addressInLocalNetwork}:${Broker.PORT_WATCHER}` });
+    });
+
+    watcherApp.post(`/${ClientLogger.URL}`, (req, res) => {
+      logger.write(req.body);
+      res.sendStatus(200);
     });
 
     watcherServer.listen(

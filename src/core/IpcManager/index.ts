@@ -1,5 +1,5 @@
 import { ContextBridge } from 'electron';
-import { IpcManagerI, IpcChannels } from './types';
+import { IpcManagerI, IpcChannels, IpcHandler } from './types';
 
 const managerInRenderer = 'ipcManager';
 
@@ -32,13 +32,13 @@ export default class IpcManager implements IpcManagerI {
     this.ipcMain = props?.ipcMain;
   }
 
-  invoke = <Channel extends keyof IpcChannels>(channel: Channel):
-    Promise<IpcChannels[Channel]> => this.ipcRenderer.invoke(channel);
+  invoke = <Channel extends keyof IpcChannels>(channel: Channel, data?: IpcChannels[Channel]):
+    Promise<IpcChannels[Channel]> => this.ipcRenderer.invoke(channel, data);
 
   handle = <Channel extends keyof IpcChannels>(
     channel: Channel,
-    handler: () => Promise<IpcChannels[Channel]> | IpcChannels[Channel],
+    handler: IpcHandler<Channel>,
   ) => {
-    this.ipcMain.handle(channel, handler);
+    this.ipcMain.handle(channel, (event, ...args) => handler(args[0]));
   };
 }

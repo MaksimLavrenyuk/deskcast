@@ -2,6 +2,7 @@ import axios from 'axios';
 import Watcher, { StreamHandler } from '../../../../../core/Deskcast/Watcher';
 import Component from '../Component';
 import ExpandIcon from '../../icons/expand_maximize_icon.svg';
+import ClientLogger from '../../../../../core/Logger/ClientLogger';
 
 type State = {
   isActiveStream: boolean;
@@ -82,7 +83,7 @@ class StreamWatcher extends Component<unknown, State> {
   private async createWatcher() {
     const connectionUri = await StreamWatcher.requestConnectionUri();
     if (connectionUri) {
-      this.watcher = new Watcher(connectionUri);
+      this.watcher = new Watcher(connectionUri, new ClientLogger());
       this.watcher.addEventListener('stream', this.streamHandler);
       this.watcher.addEventListener('closeStream', this.closeBroadcastHandler);
       this.watcher.addEventListener('cancelStream', this.cancelBroadcastHandler);

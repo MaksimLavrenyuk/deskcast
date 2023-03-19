@@ -2,6 +2,8 @@ import { action, makeObservable, observable } from 'mobx';
 import Streamer from '../../../../core/Deskcast/Streamer';
 import { SourceCollector } from '../../../../core/SourceCollector/types';
 import { GetterWatcherURLI } from '../../../../core/GetterWatcherURL/types';
+import RendererLogger from '../../../../core/Logger/RendererLogger';
+import Logger from '../../../../core/Logger/types';
 
 export type SelectScreen = (screenID: string) => void
 
@@ -19,6 +21,7 @@ export type GetWatcherURL = () => string | null;
 type StreamerViewProps = {
   sourceCollector: SourceCollector
   getterWatcherURL: GetterWatcherURLI
+  logger: Logger
 }
 
 class StreamerViewStore {
@@ -42,7 +45,7 @@ class StreamerViewStore {
   private getterWatcherURL: GetterWatcherURLI;
 
   constructor(props: StreamerViewProps) {
-    this.streamer = new Streamer();
+    this.streamer = new Streamer(props.logger);
     this.sourceCollector = props.sourceCollector;
     this.getterWatcherURL = props.getterWatcherURL;
     this.screens = [];
