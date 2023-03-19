@@ -15,13 +15,11 @@ export type WatcherEvents = {
 export type WatcherToBrokerEvents = {
   answer: (payload: { description: RTCSessionDescription }) => void;
   candidate: (payload: { candidate: RTCIceCandidate }) => void
-  watcher: () => void
+  watch: () => void
 }
 
 export type BrokerToWatcherEvents = {
-  cancel: () => void
-  disconnect: () => void
-  startStream: () => void
+  cancelStream: () => void
   offer: (payload: { description: RTCSessionDescriptionInit }) => void;
 }
 
@@ -45,23 +43,17 @@ class Watcher {
     this.peerConnection = null;
     this.eventEmitter = new StrictEventEmitter<WatcherEvents>();
 
-    this.socket.on('connect', () => console.log('connect'));
-    this.socket.on('offer', this.offerHandler);
-    this.socket.on('startStream', this.attachStreamHandler);
-    this.socket.on('disconnect', this.closeBroadcastHandler);
-    this.socket.on('cancel', this.cancelBroadcastHandler);
-    this.socket.emit('watcher');
-  }
-
-  private attachStreamHandler = () => {
-    this.socket.emit('watcher');
-  };
-
-  private offerHandler = async (payload: { description: RTCSessionDescriptionInit }) => {
     this.peerConnection = new RTCPeerConnection(PEER_CONNECTION_CONFIG);
     this.peerConnection.addEventListener('track', this.trackHandler);
     this.peerConnection.addEventListener('icecandidate', this.iceCandidateHandler);
 
+    this.socket.on('offer', this.offerHandler);
+    this.socket.on('disconnect', this.closeBroadcastHandler);
+    this.socket.on('cancelStream', this.cancelBroadcastHandler);
+    this.socket.emit('watch');
+  }
+
+  private offerHandler = async (payload: { description: RTCSessionDescriptionInit }) => {
     try {
       await this.peerConnection.setRemoteDescription(payload.description);
       const sdp = await this.peerConnection.createAnswer();
@@ -73,12 +65,12 @@ class Watcher {
   };
 
   private closeBroadcastHandler = () => {
+    this.peerConnection = null;
     this.eventEmitter.emit('closeBroadcast');
   };
 
   private cancelBroadcastHandler = () => {
     this.eventEmitter.emit('cancelBroadcast');
-    this.peerConnection = null;
   };
 
   private trackHandler = (event: RTCTrackEvent) => {

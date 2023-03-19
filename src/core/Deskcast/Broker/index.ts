@@ -1,5 +1,4 @@
 import { Server, Socket } from 'socket.io';
-import { nanoid } from 'nanoid';
 import { StreamerToBrokerEvents, BrokerToStreamerEvents, Payload } from '../Streamer';
 import isType from '../../../utils/guards/isType';
 
@@ -50,14 +49,13 @@ class Broker {
 
     watcherServer.sockets.on('error', this.errorHandler);
     watcherServer.sockets.on('connection', (socket) => {
-      const watcherID = nanoid();
-      this.watcherSockets.set(watcherID, socket);
+      this.watcherSockets.set(socket.id, socket);
 
       socket.onAny((event, ...args) => {
         if (event === 'disconnect') {
-          this.streamerSocket.emit('disconnectPeer', { id: watcherID, ...args[0] });
+          this.streamerSocket.emit('disconnectPeer', { id: socket.id, ...args[0] });
         } else {
-          this.streamerSocket.emit(event, { id: watcherID, ...args[0] });
+          this.streamerSocket.emit(event, { id: socket.id, ...args[0] });
         }
       });
     });
