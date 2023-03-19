@@ -1,6 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import IpcRendererManagerImpl from '../utils/IpcManager/IpcRendererManager';
+import IpcManager from '../core/IpcManager';
 
-IpcRendererManagerImpl.install(contextBridge, ipcRenderer);
-
-// window.addEventListener('DOMContentLoaded', () => {});
+IpcManager.installInRenderer(contextBridge, { ipcRenderer });

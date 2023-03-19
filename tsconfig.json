@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "jsx": "react",
     "allowJs": true,
     "target": "ES6",
@@ -11,7 +12,7 @@
     "baseUrl": ".",
     "outDir": "dist",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["src", "./jest-setup.ts"]
 }

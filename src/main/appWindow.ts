@@ -2,9 +2,10 @@ import {
   app, BrowserWindow, desktopCapturer, ipcMain,
 } from 'electron';
 import path from 'path';
-import IpcMainManager from '../utils/IpcManager/IpcMainManager';
+import IpcManager from '../core/IpcManager';
 import WatcherServer from '../watcher-web/server';
-import { inDev } from '../common/helpers';
+import isDev from '../utils/isDev';
+import DiskLogger from '../core/Logger/DiskLogger';
 
 // Electron Forge automatically creates these entry points
 declare const APP_WINDOW_WEBPACK_ENTRY: string;
@@ -16,14 +17,10 @@ const watcherServer = new WatcherServer();
  * Register Inter Process Communication
  */
 function registerMainIPC(appWindow: BrowserWindow) {
-  const ipcMainManager = new IpcMainManager(ipcMain, appWindow);
+  const impManager = new IpcManager({ ipcMain });
+  const logger = new DiskLogger();
 
-  /**
-   * Here you can assign IPC related codes for the application window
-   * to Communicate asynchronously from the main process to renderer processes.
-   */
-
-  ipcMainManager.on('GET_DESKTOP_CAPTURE_SOURCES', async () => {
+  impManager.handle('screenSources', async () => {
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
     const sourcesData = [];
 
@@ -34,11 +31,12 @@ function registerMainIPC(appWindow: BrowserWindow) {
       });
     }
 
-    ipcMainManager.send('DESKTOP_CAPTURE_SOURCES', { sources: sourcesData });
+    return { sources: sourcesData };
   });
 
-  ipcMainManager.on('GET_WATCHER_LINK', () => {
-    ipcMainManager.send('WATCHER_LINK', { link: watcherServer.getWatcherServerLink() });
+  impManager.handle('watcherUrl', () => ({ url: watcherServer.getWatcherServerLink() }));
+  impManager.handle('log', (data) => {
+    if (data) logger.write(data);
   });
 }
 
@@ -67,7 +65,7 @@ export default function createAppWindow(): BrowserWindow {
   // Load the index.html of the app window.
   appWindow.loadURL(APP_WINDOW_WEBPACK_ENTRY);
 
-  if (inDev()) appWindow.webContents.openDevTools();
+  if (isDev()) appWindow.webContents.openDevTools();
 
   // Show window when its ready to
   appWindow.on('ready-to-show', () => appWindow.show());

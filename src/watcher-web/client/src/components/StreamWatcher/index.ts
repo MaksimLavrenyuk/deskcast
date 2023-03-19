@@ -1,12 +1,12 @@
 import axios from 'axios';
-import Watcher, { StreamHandler } from '../../../../../core/RTCConnectionManager/Watcher';
-import SocketReceiver from '../../../../../core/RTCConnectionManager/Receiver/SocketReceiver/SocketReceiver';
+import Watcher, { StreamHandler } from '../../../../../core/Deskcast/Watcher';
 import Component from '../Component';
 import ExpandIcon from '../../icons/expand_maximize_icon.svg';
+import ClientLogger from '../../../../../core/Logger/ClientLogger';
 
 type State = {
   isActiveStream: boolean;
-  isCloseBroadcast: boolean
+  isCloseStream: boolean
 }
 
 const LOCALS = {
@@ -41,7 +41,7 @@ class StreamWatcher extends Component<unknown, State> {
 
     this.state = {
       isActiveStream: false,
-      isCloseBroadcast: false,
+      isCloseStream: false,
     };
     this.isFullScreen = false;
     this.watcher = null;
@@ -50,7 +50,7 @@ class StreamWatcher extends Component<unknown, State> {
   }
 
   private streamHandler: StreamHandler = (stream) => {
-    this.setState({ isActiveStream: true, isCloseBroadcast: false });
+    this.setState({ isActiveStream: true, isCloseStream: false });
     this.videoRef.current.srcObject = stream;
   };
 
@@ -73,20 +73,20 @@ class StreamWatcher extends Component<unknown, State> {
   };
 
   private closeBroadcastHandler = () => {
-    this.setState({ isActiveStream: false, isCloseBroadcast: true });
+    this.setState({ isActiveStream: false, isCloseStream: true });
   };
 
   private cancelBroadcastHandler = () => {
-    this.setState({ isActiveStream: false, isCloseBroadcast: false });
+    this.setState({ isActiveStream: false, isCloseStream: false });
   };
 
   private async createWatcher() {
     const connectionUri = await StreamWatcher.requestConnectionUri();
     if (connectionUri) {
-      this.watcher = new Watcher({ receiver: new SocketReceiver(connectionUri) });
+      this.watcher = new Watcher(connectionUri, new ClientLogger());
       this.watcher.addEventListener('stream', this.streamHandler);
-      this.watcher.addEventListener('closeBroadcast', this.closeBroadcastHandler);
-      this.watcher.addEventListener('cancelBroadcast', this.cancelBroadcastHandler);
+      this.watcher.addEventListener('closeStream', this.closeBroadcastHandler);
+      this.watcher.addEventListener('cancelStream', this.cancelBroadcastHandler);
     }
   }
 
@@ -131,14 +131,14 @@ class StreamWatcher extends Component<unknown, State> {
   }
 
   public render() {
-    const { isActiveStream, isCloseBroadcast } = this.state;
+    const { isActiveStream, isCloseStream } = this.state;
     const $container = document.createElement('div');
     $container.classList.add('stream-watcher');
     this.setContainerRef($container);
 
     if (isActiveStream) {
       $container.append(this.Video(), this.BtnFullScreen());
-    } else if (isCloseBroadcast) {
+    } else if (isCloseStream) {
       $container.append(this.CloseBroadcastMessage());
     } else {
       $container.append(this.Waiting());

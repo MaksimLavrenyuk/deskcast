@@ -7,6 +7,9 @@ type CopyBtnProps = {
   copyValue: string
 } & BaseButtonProps;
 
+/**
+ * Button to copy the value to the clipboard.
+ */
 function CopyBtn(props: CopyBtnProps) {
   const { copyValue, ...rest } = props;
 

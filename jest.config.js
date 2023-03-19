@@ -2,5 +2,9 @@
 
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '\\.(css|scss|sass|less)$': 'identity-obj-proxy',
+  },
+  setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
 };

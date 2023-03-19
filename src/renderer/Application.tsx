@@ -1,9 +1,12 @@
 import adapter from 'webrtc-adapter';
+import { ConfigProvider, theme } from 'antd';
 import React, { useEffect, useState } from 'react';
-import BroadcasterView from './components/BroadcasterView';
-
+import StreamerView from './components/StreamerView';
+import 'antd/dist/reset.css';
 
 console.log(JSON.stringify(adapter.browserDetails));
+
+const { darkAlgorithm } = theme;
 
 function Application() {
   const [darkTheme, setDarkTheme] = useState(true);
@@ -33,7 +36,9 @@ function Application() {
   }, [darkTheme]);
 
   return (
-    <BroadcasterView />
+    <ConfigProvider theme={{ algorithm: darkAlgorithm }}>
+      <StreamerView />
+    </ConfigProvider>
   );
 }
 
