@@ -34,7 +34,6 @@ module.exports = {
   hooks: {
     generateAssets: async () => {
       await new Promise((resolve, reject) => {
-        const inProd = process.env.NODE_ENV === 'production';
         const buildProcess = exec('yarn watcher-client-build');
 
         buildProcess.on('exit', () => {

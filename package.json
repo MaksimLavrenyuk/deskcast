@@ -9,7 +9,7 @@
     "start": "cross-env NODE_ENV=development electron-forge start",
     "watcher-client-build": "webpack build --config src/watcher-web/client/webpack.config.js",
     "package": "electron-forge package",
-    "make": "NODE_ENV=production electron-forge make",
+    "make": "electron-forge make",
     "publish": "electron-forge publish",
     "test": "jest --coverage",
     "lint": "eslint src/ --ext .ts,.js,.tsx,.jsx",
