@@ -44,7 +44,6 @@ class Streamer {
     this.logger = logger;
     this.peerConnections = {};
     this.stream = null;
-    this.logger.write({ level: 'info', message: 'streamer_start' });
 
     this.socket.on('answer', this.answerHandler);
     this.socket.on('watch', this.watchHandler);

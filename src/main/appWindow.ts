@@ -4,7 +4,7 @@ import {
 import path from 'path';
 import IpcManager from '../core/IpcManager';
 import WatcherServer from '../watcher-web/server';
-import { inDev } from '../common/helpers';
+import isDev from '../utils/isDev';
 import DiskLogger from '../core/Logger/DiskLogger';
 
 // Electron Forge automatically creates these entry points
@@ -65,7 +65,7 @@ export default function createAppWindow(): BrowserWindow {
   // Load the index.html of the app window.
   appWindow.loadURL(APP_WINDOW_WEBPACK_ENTRY);
 
-  if (inDev()) appWindow.webContents.openDevTools();
+  if (isDev()) appWindow.webContents.openDevTools();
 
   // Show window when its ready to
   appWindow.on('ready-to-show', () => appWindow.show());
