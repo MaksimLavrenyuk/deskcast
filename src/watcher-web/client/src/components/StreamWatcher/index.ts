@@ -5,7 +5,7 @@ import ExpandIcon from '../../icons/expand_maximize_icon.svg';
 
 type State = {
   isActiveStream: boolean;
-  isCloseBroadcast: boolean
+  isCloseStream: boolean
 }
 
 const LOCALS = {
@@ -40,7 +40,7 @@ class StreamWatcher extends Component<unknown, State> {
 
     this.state = {
       isActiveStream: false,
-      isCloseBroadcast: false,
+      isCloseStream: false,
     };
     this.isFullScreen = false;
     this.watcher = null;
@@ -49,7 +49,7 @@ class StreamWatcher extends Component<unknown, State> {
   }
 
   private streamHandler: StreamHandler = (stream) => {
-    this.setState({ isActiveStream: true, isCloseBroadcast: false });
+    this.setState({ isActiveStream: true, isCloseStream: false });
     this.videoRef.current.srcObject = stream;
   };
 
@@ -72,11 +72,11 @@ class StreamWatcher extends Component<unknown, State> {
   };
 
   private closeBroadcastHandler = () => {
-    this.setState({ isActiveStream: false, isCloseBroadcast: true });
+    this.setState({ isActiveStream: false, isCloseStream: true });
   };
 
   private cancelBroadcastHandler = () => {
-    this.setState({ isActiveStream: false, isCloseBroadcast: false });
+    this.setState({ isActiveStream: false, isCloseStream: false });
   };
 
   private async createWatcher() {
@@ -130,14 +130,14 @@ class StreamWatcher extends Component<unknown, State> {
   }
 
   public render() {
-    const { isActiveStream, isCloseBroadcast } = this.state;
+    const { isActiveStream, isCloseStream } = this.state;
     const $container = document.createElement('div');
     $container.classList.add('stream-watcher');
     this.setContainerRef($container);
 
     if (isActiveStream) {
       $container.append(this.Video(), this.BtnFullScreen());
-    } else if (isCloseBroadcast) {
+    } else if (isCloseStream) {
       $container.append(this.CloseBroadcastMessage());
     } else {
       $container.append(this.Waiting());
