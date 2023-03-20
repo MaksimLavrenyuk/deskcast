@@ -30,6 +30,10 @@ jobs:
           cache: yarn
       - name: install dependencies
         run: yarn --network-timeout 100000 || yarn --network-timeout 100000 || yarn --network-timeout 100000
+      - name:  Set path for candle and light
+        if: matrix.os == 'windows-latest'
+        run: echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
+        shell: bash
       - name: build
         run: yarn make --arch=${{ matrix.arch }}
         env:
