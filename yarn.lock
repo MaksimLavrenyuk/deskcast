@@ -523,6 +523,16 @@
   optionalDependencies:
     electron-installer-redhat "^3.2.0"
 
+"@electron-forge/maker-snap@^6.0.5":
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/@electron-forge/maker-snap/-/maker-snap-6.0.5.tgz#0ece4e92bcf6d174e7eb68157abdb995109ffd78"
+  integrity sha512-caduuUTViLOcbFU9T5OsmdtuujNMQ6VvGD6iYL8CBrnnRZZKi5sQVHfQZRQNlssvx73j9QS0OGynN1Nzlz0uAQ==
+  dependencies:
+    "@electron-forge/maker-base" "6.0.5"
+    "@electron-forge/shared-types" "6.0.5"
+  optionalDependencies:
+    electron-installer-snap "^5.1.0"
+
 "@electron-forge/maker-squirrel@^6.0.3":
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/@electron-forge/maker-squirrel/-/maker-squirrel-6.0.3.tgz#9afcf94d358328c169efabcd139f94dc8dc80890"
@@ -3712,6 +3722,22 @@ electron-installer-redhat@^3.2.0:
     word-wrap "^1.2.3"
     yargs "^16.0.2"
 
+electron-installer-snap@^5.1.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/electron-installer-snap/-/electron-installer-snap-5.2.0.tgz#8dd637dc94d4279d790d728b7bdb23fe9415377d"
+  integrity sha512-SRm7pCpNHMXV545JjScV8fLC9NhFli5r8L8Ju4EHdXwRh76+mwrJoUEDLItixBudZ5Mcgz1SJcDPJfWpEQWX7Q==
+  dependencies:
+    "@malept/cross-spawn-promise" "^1.0.0"
+    debug "^4.3.4"
+    electron-installer-common "^0.10.2"
+    fs-extra "^9.0.0"
+    js-yaml "^3.10.0"
+    lodash "^4.17.15"
+    semver "^7.1.1"
+    tmp-promise "^3.0.2"
+    which "^2.0.1"
+    yargs "^16.0.2"
+
 electron-is-dev@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-0.3.0.tgz#14e6fda5c68e9e4ecbeff9ccf037cbd7c05c5afe"
@@ -6330,7 +6356,7 @@ jest@^28.1.3:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@^3.13.1:
+js-yaml@^3.10.0, js-yaml@^3.13.1:
   version "3.14.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.1.tgz#dae812fdb3825fa306609a8717383c50c36a0537"
   integrity sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==

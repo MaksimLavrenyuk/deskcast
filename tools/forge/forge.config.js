@@ -1,6 +1,7 @@
 // Forge Configuration
 const path = require('path');
 const { exec } = require('child_process');
+const pkg = require('../../package.json');
 
 const rootDir = process.cwd();
 const iconDir = path.resolve(rootDir, 'src', 'assets', 'icons');
@@ -97,6 +98,13 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       platforms: ['linux'],
       config: commonLinuxConfig,
+    },
+    {
+      name: '@electron-forge/maker-snap',
+      config: {
+        version: pkg.version,
+        summary: pkg.description,
+      },
     },
   ],
   // Forge Plugins

@@ -13,8 +13,8 @@ jobs:
         # Build for supported platforms
         # https://github.com/electron/electron-packager/blob/ebcbd439ff3e0f6f92fa880ff28a8670a9bcf2ab/src/targets.js#L9
         # 32-bit Linux unsupported as of 2019: https://www.electronjs.org/blog/linux-32bit-support
-        os: [ macOS-latest, ubuntu-latest, windows-latest ]
-        arch: [ x64, arm64 ]
+        os: [ macOS-latest, ubuntu-20.04, windows-latest ]
+        arch: [ x64 ]
         # Publishing artifacts for multiple Windows architectures has
         # a bug which can cause the wrong architecture to be downloaded
         # for an update, so until that is fixed, only build Windows x64
@@ -23,6 +23,9 @@ jobs:
             arch: arm64
 
     steps:
+      - name: Install Snapcraft
+        if: matrix.os == 'ubuntu-20.04'
+        uses: samuelmeuli/action-snapcraft@v2
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
         with:
@@ -52,4 +55,5 @@ jobs:
             out/**/*.nupkg
             out/**/*.rpm
             out/**/*.zip
+            out/**/*.snap
             out/**/RELEASES
